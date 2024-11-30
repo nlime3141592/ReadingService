@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>TEST.html</title>
+    </head>
+    <body>
+        <div>
+            <button id="test_btn_back">메인 페이지로 돌아가기</button>
+        </div>
+        <h1>Test Page</h1>
+        본 페이지는 몇 가지 기능 테스트를 위해 임시로 구현한 페이지입니다.<br />
+        테스트 목록과 설명을 기술합니다.<br />
+        만약 테스트 하고싶은 내용이 있다면 이 페이지를 활용하세요.<br />
+        본 페이지를 자세히 분석하고 싶다면 test.html 및 test.js 파일을 확인하세요.
+        <div>
+            <h2>POST test 1</h2>
+            <p>
+                POST 요청을 form 태그에서 수행하는 방법을 보여줍니다.<br />
+            </p>
+            <form action="/test/send" method="POST" id="input_form_0">
+                <p>
+                    <span>
+                        <label for="test_input_0">input0: </label>
+                        <input type="text" placeholder="message here..." id="test_input_0" name="input0" />
+                    </span>
+                </p>
+                <p>
+                    <span>
+                        <label for="test_input_1">input1: </label>
+                        <input type="text" placeholder="message here..." id="test_input_1" name="input1" />
+                    </span>
+                </p>
+                <button type="submit" id="test_btn_0" disabled>send</button>이 버튼은 작동하지 않습니다.
+            </form>
+            <h3>테스트 결론</h3>
+            <p>
+                동작 방식이 복잡하므로 사용하지 않도록 한다.<br />
+                <ol>
+                    <li>HTML에서 name 속성을 통해 보낼 데이터가 포함된 컨테이너를 명시</li>
+                    <li>추가 데이터를 보내려면 제출 버튼을 누를 때 javascript로 form 객체를 얻은 후 type="hidden"인 input 태그를 동적으로 생성해 데이터를 삽입해줘야 함.</li>
+                </ol>
+                위에 따르면 html 파일과 js파일을 동시에 관리해야 하는데 이는 복잡하다.
+            </p>
+        </div>
+        <div>
+            <h2>POST test 2</h2>
+            <p>
+                POST 요청을 javascript의 fecth() 함수를 이용해 수행하는 방법을 보여줍니다.<br />
+            </p>
+            <p>
+                <span>
+                    <label>input2: </label>
+                    <input type="text" placeholder="message here..." id="test_input_2" />
+                </span>
+            </p>
+            <p>
+                <span>
+                    <label>input3: </label>
+                    <input type="text" placeholder="message here..." id="test_input_3" />
+                </span>
+            </p>
+            <button id="test_btn_1">send</button>
+            <h3>테스트 결론</h3>
+            <p>
+                POST test 1 대신 POST test 2 방식의 POST 처리를 사용하도록 한다.<br />
+                기능 변경 시 js 파일만 수정하여 관리 복잡도를 낮출 수 있다.
+            </p>
+        </div>
+        <div>
+            <h2>Python Subprocess</h2>
+            <p>
+                Node.js에서 Python 모듈을 실행해 결과를 얻어오는 방법을 보여줍니다.<br />
+            </p>
+            <form>
+                <label><input type="radio" name="opcode" opcode="add" id="test_radio_add" checked>Add</label><br />
+                <label><input type="radio" name="opcode" opcode="sub" id="test_radio_sub">Subtract</label><br />
+                <label><input type="radio" name="opcode" opcode="mul" id="test_radio_mul">Multiply</label><br />
+                <label><input type="radio" name="opcode" opcode="div" id="test_radio_div">Division</label>
+            </form>
+            <p>
+                <span>
+                    <label>Operand A: </label>
+                    <input type="text" placeholder="number here..." id="test_input_a" />
+                </span>
+            </p>
+            <p>
+                <span>
+                    <label>input3: </label>
+                    <input type="text" placeholder="number here..." id="test_input_b" />
+                </span>
+            </p>
+            <p>
+                <label id="label_0">결과: -</label>
+            </p>
+            <button id="test_btn_2">send</button>
+        </div>
+
+        <script src="../js/test.js"></script>
+    </body>
+</html>
