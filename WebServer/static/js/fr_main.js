@@ -76,7 +76,7 @@ async function getRecommend() {
   mode = 1;
   pageNum = 0;
   // 서버에서 추천 받기
-  isbnList[mode] = (await fetch(``)).json();
+  isbnList[mode] = (await fetch(`/search/by-recommendation/${pageNum}`)).json();
   getNextPage(+1);
   setStatus("추천 도서");
 }
@@ -86,7 +86,7 @@ async function getRecord() {
   mode = 2;
   pageNum = 0;
   // notion 에서 리스트 가져오기
-  isbnList[mode] = (await fetch(``)).json();
+  isbnList[mode] = (await fetch(`/search/by-history/${pageNum}`)).json();
   getNextPage(+1);
   setStatus("독서 기록");
 }
@@ -95,7 +95,7 @@ async function getRecord() {
 async function getSearch() {
   mode = 3;
   pageNum = 0;
-  searchKeyword = document.getElementsByClassName("search-text")[0].textContent;
+  searchKeyword = document.getElementsByClassName("search-text")[0].value;
   getNextPage(+1);
   setStatus(`검색: ${searchKeyword}`);
 }
@@ -128,7 +128,7 @@ async function getBookList(pageNum) {
   switch (mode) {
     case 0: // 메인
       // DB에 전체 목록에 대한 (pageNum, pageNum+12)의 요청
-      const response_main = await fetch(``);
+      const response_main = await fetch(`/search/all/${pageNum}`);
       bookList = await response_main.json();
       break;
     case 1: // 추천
@@ -137,7 +137,7 @@ async function getBookList(pageNum) {
         for (let idx = (pageNum - 1) * 12 + 1; idx <= pageNum * 12; i++) {
           const isbn = isbnList[mode][idx];
           // DB에서 특정 ISBN에 대한 bookInfo의 요청
-          const response_record = await fetch(``);
+          const response_record = await fetch(`/search/by-isbn13/${isbn}/${pageNum}`);
           // 결과를 bookList에 저장
           bookList.push(await response.json());
         }
@@ -145,7 +145,7 @@ async function getBookList(pageNum) {
       break;
     case 3: // 검색 기록
       // DB에서 특정 검색 목록에 대한 (pageNum, pageNum+10)의 요청
-      const response_search = await fetch(``);
+      const response_search = await fetch(`/search/by-keyword/${searchKeyword}/${pageNum}`);
       bookList = await response_search.json();
     default:
       console.log("Invalid page mode");
