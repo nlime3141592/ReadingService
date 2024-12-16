@@ -5,7 +5,7 @@ const xml2js = require("xml2js");
 
 // MongoDB 설정
 const MONGO_URI = "mongodb+srv://kyesjh:6fI0LzAzk8gTILfT@cluster0.5n9fk.mongodb.net/book?retryWrites=true&w=majority";
-const TTB_KEY = "ttbkyesjh1509001"; // 알라딘 API Key
+const TTB_KEY = "api key"; // 알라딘 API Key
 const LOG_FILE = "info_fetch_log.json"; // 로그 파일 이름
 
 // MongoDB 스키마 및 모델 정의

@@ -5,7 +5,7 @@ const xml2js = require("xml2js");
 
 // MongoDB 설정
 const MONGO_URI = "mongodb+srv://kyesjh:6fI0LzAzk8gTILfT@cluster0.5n9fk.mongodb.net/book?retryWrites=true&w=majority";
-const AUTH_KEY = "594dc0c98c432729b21c6d771a0ffc16526b677a3dc6925d38d0529e92b43d57";
+const AUTH_KEY = "api key";
 const LOG_FILE = "keyword_fetch_log.json"; // 로그 파일
 
 // MongoDB 스키마 및 모델 정의
