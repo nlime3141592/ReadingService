@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Book Report</title>
+    <link rel="icon" href="../img/bookIcon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="../css/fr_bookReport.css" />
+    <link
+      rel="stylesheet"
+      as="style"
+      crossorigin
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+      integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="grid-layout" class="container-fluid" style="margin: 0">
+      <div class="row">
+        <div class="col-md-2" style="padding: 0">
+          <nav class="nav flex-column">
+            <div id="main-icon">
+              <img src="../img/bookIcon2.png" />
+              <div>Book Recommendation System</div>
+              <div>& Reading Note</div>
+            </div>
+            <a href="#" class="nav-item nav-link" id="btn-home">홈</a>
+            <a href="#" class="nav-item nav-link" id="btn-recommend"
+              >추천 도서</a
+            >
+            <a href="#" class="nav-item nav-link" id="btn-record">독서 기록</a>
+            <div class="nav-item nav-link"></div>
+          </nav>
+        </div>
+        <div class="col-md-10" style="padding: 0">
+          <main class="content">
+            <div id="top-panel">
+              <div id="book-info">
+                <img src="" id="book-info-image" />
+                <div id="book-info-text"></div>
+              </div>
+              <div id="btn-done">작성 완료</div>
+            </div>
+            <div id="editor-area" class="scrollable-container">
+              <div id="editor"></div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+    <script>
+      const quill = new Quill("#editor", {
+        theme: "snow",
+      });
+    </script>
+    <script src="../js/fr_bookReport.js"></script>
+  </body>
+</html>
