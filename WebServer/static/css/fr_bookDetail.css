@@ -1,0 +1,333 @@
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #4f4b48b6;
+  border-radius: 20px;
+}
+
+body {
+  background-color: #2f2b28;
+  margin: 0;
+  font-family: "Pretendard Variable", Pretendard, -apple-system,
+    BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI",
+    "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", sans-serif !important;
+}
+
+.nav {
+  background-color: #1d1916;
+  height: 100vh;
+}
+
+.content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #2f2b28;
+}
+
+.nav-item.nav-link {
+  border-top: 1px solid #2f2b28;
+  color: #e8e7e2;
+  font-size: 22px;
+  padding-left: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+#main-icon {
+  position: relative;
+  color: #e8e7e2;
+  text-align: center;
+  font-weight: 500;
+  font-size: 18px;
+  height: 20%;
+  margin-top: 50px;
+}
+
+#main-icon img {
+  height: 35%;
+  width: auto;
+  transition: transform 1s;
+}
+
+#main-icon img:hover {
+  transform: scale(1.1);
+}
+
+.content-back {
+  background-color: #8f7463;
+  border-radius: 40px;
+  height: 90%;
+  width: 90%;
+}
+
+#grid-layout {
+  max-height: 100%;
+}
+
+.image-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.image-slot img {
+  height: auto;
+  width: 80%;
+}
+
+.desc-slot {
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  padding-top: 5%;
+  color: #221e1c;
+  font-weight: 500;
+}
+
+.desc-slot #book-title {
+  text-align: center;
+  text-shadow: 0px 0px 4px #221e1c;
+  font-size: 40px;
+  font-weight: 500;
+  color: #ece5cf;
+  word-break: keep-all;
+  letter-spacing: -1px;
+}
+
+#book-author-slot {
+  text-align: center;
+  margin-top: -5px;
+  color: #221e1c;
+  font-size: 18px;
+  font-weight: 300;
+  letter-spacing: -2px;
+}
+
+#book-detail {
+  margin-top: 30px;
+  line-height: 30px;
+}
+
+#book-detail .k {
+  font-size: 22px;
+  font-weight: 500;
+  display: inline-block;
+  width: 120px;
+}
+
+#book-detail .v {
+  font-size: 28px;
+  font-weight: 300;
+}
+
+#book-detail #book-description {
+  padding: 12px;
+  height: 200px;
+  max-width: 95%;
+  border-top: 1px solid #c4a876;
+  border-bottom: 1px solid #c4a876;
+  background-color: #e4c7966e;
+  font-size: 20px;
+  line-height: 28px;
+}
+
+#book-detail #book-description-slot .k {
+  font-size: 22px;
+  margin-top: 5px;
+  margin-bottom: -30px;
+}
+
+#bottom-grid {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: auto;
+  width: 95%;
+  text-align: center;
+  background-color: #af9483;
+  border-radius: 5px;
+  padding: 1% 4%;
+  margin: 4% 0;
+  box-sizing: border-box;
+}
+
+#bottom-grid-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: auto;
+}
+
+#bottom-grid-row .col-md-3 {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#book-link {
+  color: #221e1c;
+  text-decoration: none;
+  aspect-ratio: 1/1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  width: 80%;
+  height: auto;
+  background-color: aliceblue;
+  border-radius: 5px;
+  transition: scale 0.3s;
+}
+
+#book-link:hover {
+  scale: 1.03;
+  cursor: pointer;
+}
+
+#book-link img {
+  padding-top: 5%;
+  width: 60%;
+  height: auto;
+}
+
+#book-link div {
+  line-height: 40px;
+  font-size: 20px;
+  font-weight: 300;
+}
+
+#book-customerReviewRank-image {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 3px;
+}
+
+#book-customerReviewRank-image #clr_image {
+  width: 50%;
+  height: auto;
+  display: block;
+  clip-path: inset(100% 0 0 0);
+  position: relative;
+  z-index: 2;
+}
+
+#book-customerReviewRank-text {
+  line-height: 1;
+}
+
+#book-customerReviewRank-text #desc {
+  font-size: 13px;
+}
+#book-customerReviewRank-text #score {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+#user-rank {
+  height: auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: clamp(8px, 1vw, 18px);
+  font-weight: 500;
+}
+
+.rank-item {
+  aspect-ratio: 1/1;
+  width: 70%;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 90px;
+  background-color: #1d19168e;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  transition: scale 0.2s;
+}
+
+.rank-item:hover {
+  scale: 1.05;
+  cursor: pointer;
+}
+
+.rank-item:active img {
+  transform: scale(0.9);
+}
+
+.rank-item img {
+  max-width: 50%;
+  height: auto;
+  display: block;
+  transition: scale 0.1s;
+}
+
+#reading-note {
+  color: #221e1c;
+  text-decoration: none;
+  aspect-ratio: 1/1;
+  height: auto;
+  width: 80%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  background-color: #2e2b28;
+  color: #e8e7e2;
+  transition: scale 0.3s;
+  font-size: clamp(8px, 1vw, 15px);
+}
+
+#reading-note img {
+  width: 60%;
+  height: auto;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+#reading-note:hover {
+  scale: 1.03;
+  cursor: pointer;
+}
+
+.login-button {
+  margin: 10px;
+  border-radius: 20px;
+  background-color: #6c5d53;
+  margin-top: auto;
+  margin-bottom: 30px;
+  text-align: center;
+  color: #e8e7e2;
+  font-size: 18px;
+  transition: scale 0.5s, background-color 0.7s;
+}
+
+.login-button:hover {
+  scale: 1.04;
+  background-color: #8f7463;
+  cursor: pointer;
+}
+
+.login-button img {
+  scale: 0.5;
+  margin-bottom: -20px;
+}
+
+.login-button div {
+  margin-bottom: 10px;
+}
