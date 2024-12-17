@@ -1,6 +1,7 @@
 console.log("load main.js");
 
-const BOOKS_PER_PAGE = 12
+let storedJWE = localStorage.getItem("jweToken");
+const BOOKS_PER_PAGE = 12;
 
 let pageNum = 1;
 // isbn 리스트 | {0: 없음, 1: 추천, 2: 독서 기록}
@@ -42,6 +43,7 @@ window.onload = function () {
     const { function: funcName, mode } = eventData;
     if (funcName === "initBookList" && mode) {
       switch (mode) {
+        default:
         case 0:
           getHome();
           break;
@@ -54,6 +56,12 @@ window.onload = function () {
       }
     }
     localStorage.removeItem("event"); // 실행 후 삭제
+  }
+  const urlParams = new URLSearchParams(window.location.search);
+  const jwe = urlParams.get("jwe");
+  if (jwe) {
+    localStorage.setItem("jweToken", jwe);
+    storedJWE = localStorage.getItem("jweToken");
   }
 };
 
@@ -130,7 +138,9 @@ async function getBookList(pageNum) {
   switch (mode) {
     case 0: // 메인
       // DB에 전체 목록에 대한 (pageNum, pageNum+12)의 요청
-      const response_main = await fetch(`/search/all?pageNum=${pageNum}&booksPerPage=${BOOKS_PER_PAGE}`);
+      const response_main = await fetch(
+        `/search/all?pageNum=${pageNum}&booksPerPage=${BOOKS_PER_PAGE}`
+      );
       bookList = await response_main.json();
       break;
     case 1: // 추천
@@ -147,7 +157,9 @@ async function getBookList(pageNum) {
       break;
     case 3: // 검색 기록
       // DB에서 특정 검색 목록에 대한 (pageNum, pageNum+10)의 요청
-      const response_search = await fetch(`/search/by-keyword/${searchKeyword}?pageNum=${pageNum}&booksPerPage=${BOOKS_PER_PAGE}`);
+      const response_search = await fetch(
+        `/search/by-keyword/${searchKeyword}?pageNum=${pageNum}&booksPerPage=${BOOKS_PER_PAGE}`
+      );
       bookList = await response_search.json();
     default:
       console.log("Invalid page mode");

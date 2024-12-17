@@ -1,9 +1,11 @@
 console.log("load bookReport.js");
 
+let storedJWE = localStorage.getItem("jweToken");
+
+// 감상문 등록 버튼
 const submitButton = document.getElementById("btn-done");
 
-// 미구현 - Notion으로 올리는 함수 필요
-submitButton.onclick = test;
+submitButton.onclick = submit;
 
 // 네비게이션 바
 const homeButton = document.getElementById("btn-home");
@@ -33,6 +35,20 @@ async function init() {
 
   document.querySelector("#book-info-image").src = bookInfo["cover"];
   document.querySelector("#book-info-text").textContent = bookInfo["title"];
+
+  // jwe 토큰 verify하는 경로 필요
+  const verifyResult = storedJWE
+    ? await fetch(``, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jwe: storedJWE }),
+      })
+    : false;
+  if (verifyResult && !verifyResult.ok) {
+    window.alert("Notion에 다시 로그인해주세요.");
+    localStorage.removeItem("jweToken");
+    goBookList(0);
+  }
 }
 
 /**
@@ -47,24 +63,20 @@ function goBookList(mode) {
   window.location = "/";
 }
 
-/**
- * 변환 확인용 테스트 함수
- */
-function test() {
-  const richText = document.getElementsByClassName("ql-editor")[0];
-  console.log(htmlToNotion(richText));
-}
-
 async function submit() {
   const richText = htmlToNotion(
     document.getElementsByClassName("ql-editor")[0]
   );
-  const responseUploadReport = await fetch(``, {
+  const responseUploadReport = await fetch(`/readnote/upload`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(richText),
+    body: {
+      jwe: storedJWE,
+      isbn: urlParams.get("isbn"),
+      report: JSON.stringify(richText),
+    },
   });
   if (responseUploadReport.ok) {
     window.alert("등록되었습니다.");

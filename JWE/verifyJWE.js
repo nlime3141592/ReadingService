@@ -5,7 +5,8 @@ const jose = require("jose");
 const privateKeyPem = fs.readFileSync("private.pem", "utf-8");
 const privateKey = crypto.createPrivateKey(privateKeyPem);
 
-async function decryptJWE(jwe) {
+async function verifyJWE(jwe) {
+  if (typeof jwe != String) return false;
   // JWE 복호화
   const { plaintext, _ } = await jose.compactDecrypt(jwe, privateKey);
 
@@ -29,3 +30,27 @@ async function decryptJWE(jwe) {
 
   return payload["token"];
 }
+
+async function getAccessablePageId(token) {
+  const res = await fetch("https://api.notion.com/v1/search", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Notion-Version": "2022-06-28",
+    },
+    body: JSON.stringify({
+      query: "",
+      filter: {
+        value: "page",
+        property: "object",
+      },
+    }),
+  });
+  if (!res.ok) {
+    return false;
+  }
+  const data = await res.json();
+  return data.results[0]?.id || null;
+}
+
+module.exports = { verifyJWE, getAccessablePageId };
