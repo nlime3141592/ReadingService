@@ -6,6 +6,10 @@
   border-radius: 20px;
 }
 
+.hide {
+  display: none !important;
+}
+
 body {
   background-color: #2f2b28;
   margin: 0;
@@ -114,4 +118,31 @@ body {
   margin-left: 1vw;
   font-size: clamp(8px, 10vw, 25px);
   font-weight: 500;
+}
+
+.login-button {
+  margin: 10px;
+  border-radius: 20px;
+  background-color: #6c5d53;
+  margin-top: auto;
+  margin-bottom: 30px;
+  text-align: center;
+  color: #e8e7e2;
+  font-size: 18px;
+  transition: scale 0.5s, background-color 0.7s;
+}
+
+.login-button:hover {
+  scale: 1.04;
+  background-color: #8f7463;
+  cursor: pointer;
+}
+
+.login-button img {
+  scale: 0.5;
+  margin-bottom: -20px;
+}
+
+.login-button div {
+  margin-bottom: 10px;
 }

@@ -1,6 +1,8 @@
 console.log("load bookDetail.js");
 
 let storedJWE = sessionStorage.getItem("jweToken");
+let logined = false;
+let isbn = "";
 
 const userRankButton = document.getElementById("user-rank-button");
 
@@ -27,19 +29,14 @@ recordButton.onclick = () => {
   goBookList(2);
 };
 
-userRankButton.onclick = () => {
-  setUserRank();
-};
-
 window.onload = async function () {
   await isLogined();
   const urlParams = new URLSearchParams(window.location.search);
-  const isbn = urlParams.get("isbn");
-  setBook(isbn);
+  isbn = urlParams.get("isbn");
+  setBook();
 };
 
 async function isLogined() {
-  let logined = false;
   if (storedJWE != null) {
     const verifyResult = await fetch(`/jwe/verify`, {
       method: "POST",
@@ -72,21 +69,64 @@ function goBookList(mode) {
   window.location = "/";
 }
 
-function setUserRank() {
+function setRankButtonEnabled(enable) {
+  userRankButton.disabled = !enable;
+
+  if (enable) {
+    userRankButton.onclick = () => {
+      setUserRank();
+    };
+  } else {
+    userRankButton.onclick = null;
+  }
+}
+
+async function getUserRank() {
+  const rankResult = await fetch("/notion/rank/get/isbn", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      jwe: storedJWE,
+      isbn: isbn,
+    }),
+  });
+  return rankResult.text();
+}
+
+async function setUserRank() {
+  setRankButtonEnabled(false);
+  let prevRank = rank;
   if (rank != 1) {
     rank = 1;
   } else {
     rank = -1;
   }
-  document.querySelector("#user-rank img").src =
-    rank == 1 ? "./img/pineappleIcon.png" : "./img/pineconeIcon.png";
+  const rankUpdateResult = await fetch("/notion/rank/update/isbn", {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      jwe: storedJWE,
+      isbn: isbn,
+      rank: rank == 1 ? "❤" : "💙",
+    }),
+  });
+  if (rankUpdateResult.ok) {
+    document.querySelector("#user-rank img").src =
+      rank == 1 ? "./img/pineappleIcon.png" : "./img/pineconeIcon.png";
+  } else {
+    rank = prevRank;
+  }
+  setRankButtonEnabled(true);
 }
 
 /**
  * 책 설명을 설정
- * @param {*} isbn isbn번호
  */
-async function setBook(isbn) {
+async function setBook() {
   const bookInfo = await (await fetch(`/search/by-isbn13/${isbn}`)).json();
   setBookTitleSlot(bookInfo);
   setBookDetail(bookInfo);
@@ -128,7 +168,7 @@ function setBookDetail(bookInfo) {
  * 하단부의 버튼들 설정
  * @param {JSON} bookInfo JSON 형식의 book info
  */
-function setBottomGrid(bookInfo) {
+async function setBottomGrid(bookInfo) {
   // set book link button
   document.querySelector("#book-link").href = bookInfo["link"];
   // set customer review rank
@@ -144,18 +184,26 @@ function setBottomGrid(bookInfo) {
   // set user rank
   const userRank = document.querySelector("#user-rank");
   // notion 에서 기존 유저의 평가 가져오는 방법이 필요
-  const temp = "pineapple";
-  if (temp == "pineapple") {
+  let rankMark = "🤍";
+  if (logined) {
+    rankMark = await getUserRank();
+  }
+  if (rankMark == "❤") {
     rank = 1;
     userRank.querySelector("img").src = "./img/pineappleIcon.png";
-  } else if (temp == "pinecone") {
+  } else if (rankMark == "💙") {
     rank = -1;
     userRank.querySelector("img").src = "./img/pineconeIcon.png";
+  } else {
+    rank = 0;
+    userRank.querySelector("img").src = "";
   }
+
+  setRankButtonEnabled(true);
 
   // set report button
   const reportButton = document.querySelector("#reading-note");
   // 세션에 따라 표시 여부 설정 필요
   // 연결될 url 삽입
-  reportButton.href = "";
+  reportButton.href = `/readnote/?isbn=${isbn}`;
 }

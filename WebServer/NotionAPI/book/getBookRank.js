@@ -18,7 +18,7 @@ async function getEveryBookRank(token, pageId) {
 async function getBookRankByISBN(token, pageId, isbn) {
   headers["Authorization"] = token;
   const databaseId = await getDatabaseId.getDatabaseId(token, pageId);
-  const tupleData = await getTupleByISBN.foundISBN(databaseId, isbn);
+  const tupleData = await getTupleByISBN.foundISBN(token, databaseId, isbn);
   const bookRank = extractRankFromTuple(tupleData) ?? false;
   return bookRank;
 }
@@ -45,7 +45,8 @@ function extractRankFromTuples(everyTupleData) {
   return result;
 }
 
-async function getEveryTuple(databaseId) {
+async function getEveryTuple(token, databaseId) {
+  headers["Authorization"] = token;
   let has_more = true,
     next_cursor = null,
     totalResult = [];

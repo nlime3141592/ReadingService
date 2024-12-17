@@ -19,6 +19,7 @@ const api_search = require("./src/api/api_search.js");
 const api_readnote = require("./src/api/api_readnote.js");
 const api_detail = require("./src/api/api_detail.js");
 const api_JWE = require("./src/api/api_JWE.js");
+const api_notion = require("./src/api/api_notion.js");
 
 // NOTE: 상수
 const c_NUM_PORT_HTTP = 8080; // HTTP 포트
@@ -49,6 +50,7 @@ async function main() {
   api_readnote.init(app);
   api_detail.init(app);
   api_JWE.init(app);
+  api_notion.init(app);
 
   await db_connection.init();
 
