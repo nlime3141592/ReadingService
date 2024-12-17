@@ -2,11 +2,11 @@ const axios = require("axios");
 const getTupleByISBN = require("./getTupleByISBN");
 
 const headers = {
-  Authorization: "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",
+  Authorization: "사용자 Token 들어가야함",
   "Notion-Version": "2022-06-28",
 };
-const pageId = "1479ede653a980c5aa9fe6f2109c4612";
-const isbn = "testISBN";
+const pageId = "접근 가능한 사용자 pageId";
+const isbn = "작성한 책의 ISBN";
 
 testReport = {
   children: [
@@ -40,6 +40,13 @@ testReport = {
   }
 })();
 
+/**
+ *
+ * @param {string} pageId 독후감이 작성될 notion page id
+ * @param {*} isbn 독후감 작성한 책의 isbn
+ * @param {JSON} reportJson 등록될 감상문 - report 페이지에서 생성되는거 그대로 주면됨
+ * @returns response 받음 - 200이면 ok
+ */
 async function addBookReport(pageId, isbn, reportJson) {
   const tupleId = await getTupleByISBN.getTuple(pageId, isbn);
   const addReportResult = await addReport(tupleId, reportJson);
