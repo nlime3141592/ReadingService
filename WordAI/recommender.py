@@ -101,9 +101,17 @@ def select_one_keyword(model, keywords):
             selectedKeywordIndex = i
             maxDotSum = positiveDot
 
-    return randomKeywords[selectedKeywordIndex]
+    return selectedKeywordIndex
 
 def recommend_one_keyword(model, data):
-    keywords = translate_keywords(data)
-    selectedKeyword = select_one_keyword(model, keywords)
-    return selectedKeyword
+    keywords_ko = string_to_keywords(data)
+    keywords_en = translate_keywords(data)
+    selectedKeywordIndex = select_one_keyword(model, keywords_en)
+
+    # NOTE: 최종 선정된 키워드의 한글 버전입니다.
+    selectedKeyword_ko = keywords_ko[2][selectedKeywordIndex]
+
+    # NOTE: 최종 선정된 키워드의 영어 버전입니다.
+    selectedKeyword_en = keywords_en[2][selectedKeywordIndex].split("+")[1]
+
+    return selectedKeyword_en

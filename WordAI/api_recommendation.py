@@ -12,8 +12,8 @@ def main():
     clientSocket.sendall(strKeywords.encode("utf-8"))
     dataBytes = clientSocket.recv(8192)
     clientSocket.close()
-    print("Selected Keyword == ", end="")
-    print(dataBytes.decode("utf-8"))
+    print(dataBytes.decode("utf-8"), end="")
+    sys.stdout.flush()
 
 if __name__ == "__main__":
     main()

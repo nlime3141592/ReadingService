@@ -60,13 +60,13 @@ function __execPromise(command)
     return new Promise((resolve, reject) => {
         exec(command, (error, stdout, stderr) => {
             if (error) {
-                // reject(error)
-                reject(false)
+                reject(error)
+                // reject(false)
                 return
             }
 
-            // resolve({ stdout, stderr })
-            resolve(true)
+            resolve({ stdout, stderr })
+            // resolve(true)
         })
     })
 }
