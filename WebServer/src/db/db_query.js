@@ -1,83 +1,74 @@
 module.exports = {
-    query_page_from_all_books: __query_page_from_all_books,
-    query_book_info_by_isbn13: __query_book_info_by_isbn13,
-    query_page_from_keyword: __query_page_from_keyword
+  query_page_from_all_books: __query_page_from_all_books,
+  query_book_info_by_isbn13: __query_book_info_by_isbn13,
+  query_page_from_keyword: __query_page_from_keyword,
+};
+
+const utility = require("../utility.js");
+const db_connection = require("./db_connection.js");
+
+async function __query_page_from_all_books(pageNum, booksPerPage) {
+  const dbBook = db_connection.get_db("book");
+  const sourceCollection = dbBook.collection("bookinfo");
+
+  booksPerPage = Number(booksPerPage);
+  let skipBookNum = (pageNum - 1) * booksPerPage;
+
+  const query = {};
+  const batch = await sourceCollection
+    .find(query)
+    // .sort({ _id: 1 })
+    .skip(skipBookNum)
+    .limit(booksPerPage)
+    .toArray();
+
+  return batch;
 }
 
-const utility = require("../utility.js")
-const db_connection = require("./db_connection.js")
+async function __query_book_info_by_isbn13(isbn13) {
+  const dbBook = db_connection.get_db("book");
+  const sourceCollection = dbBook.collection("bookinfo");
 
-async function __query_page_from_all_books(pageNum, booksPerPage)
-{
-    const dbBook = db_connection.get_db("book")
-    const sourceCollection = dbBook.collection("bookisbn")
+  const query = { isbn13: isbn13 };
+  const batch = await sourceCollection.find(query).toArray();
 
-    booksPerPage = Number(booksPerPage)
-    let skipBookNum = pageNum * booksPerPage
-
-    const query = {}
-    const batch = await sourceCollection
-        .find(query)
-        // .sort({ _id: 1 })
-        .skip(skipBookNum)
-        .limit(booksPerPage)
-        .toArray()
-
-    return batch
+  if (batch.length === 0) {
+    utility.printLogWithName("No data gets.", "dbQuery");
+    return {};
+  } else {
+    utility.printLogWithName("Success query by-isbn13.", "dbQuery");
+    return batch[0];
+  }
 }
 
-async function __query_book_info_by_isbn13(isbn13)
-{
-    const dbBook = db_connection.get_db("book")
-    const sourceCollection = dbBook.collection("bookisbn")
+async function __query_page_from_keyword(keyword, pageNum, booksPerPage) {
+  const dbBook = db_connection.get_db("book");
+  const sourceCollection = dbBook.collection("bookinfo");
 
-    const query = { isbn13: isbn13 }
-    const batch = await sourceCollection
-        .find(query)
-        .toArray()
+  keywordList = keyword.split(" ");
 
-    if (batch.length === 0) 
-    {
-        utility.printLogWithName("No data gets.", "dbQuery")
-        return {}
-    }
-    else
-    {
-        utility.printLogWithName("Success query by-isbn13.", "dbQuery")
-        return batch[0]
-    }
-}
+  booksPerPage = Number(booksPerPage);
+  let skipBookNum = (pageNum - 1) * booksPerPage;
 
-async function __query_page_from_keyword(keyword, pageNum, booksPerPage)
-{
-    const dbBook = db_connection.get_db("book")
-    const sourceCollection = dbBook.collection("bookinfo")
+  const query = {
+    $or: [],
+  };
 
-    keywordList = keyword.split(" ")
+  for (let key of keywordList) {
+    query["$or"].push({
+      title: { $regex: `.*${key}*.` },
+    });
 
-    booksPerPage = Number(booksPerPage)
-    let skipBookNum = pageNum * booksPerPage
+    query["$or"].push({
+      author: { $regex: `.*${key}*.` },
+    });
+  }
 
-    const query = {
-        $or: []
-    }
+  const batch = await sourceCollection
+    .find(query)
+    .skip(skipBookNum)
+    .limit(booksPerPage)
+    .toArray();
 
-    for (let key of keywordList)
-    {
-        query["$or"].push({
-            title: { $regex: `.*${key}*.`}
-        })
-
-        query["$or"].push({
-            author: { $regex: `.*${key}*.`}
-        })
-    }
-
-    const batch = await sourceCollection
-        .find(query)
-        .skip(skipBookNum)
-        .limit(booksPerPage)
-        .toArray()
-
-    return batch
+  return batch;
 }

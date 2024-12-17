@@ -10,15 +10,6 @@ const headers = {
 const pageId = "1479ede653a980c5aa9fe6f2109c4612";
 const isbn = "testISBN";
 
-(async () => {
-  try {
-    console.log(await getBookRankByISBN(pageId, isbn));
-    console.log(await getEveryBookRank(pageId));
-  } catch (error) {
-    console.error("Failed: ", error);
-  }
-})();
-
 async function getEveryBookRank(pageId) {
   const databaseId = await getDatabaseId.getDatabaseId(pageId);
   const everyTupleData = await getEveryTuple(databaseId);

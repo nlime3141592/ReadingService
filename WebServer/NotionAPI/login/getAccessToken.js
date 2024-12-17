@@ -1,15 +1,6 @@
 const axios = require("axios");
 
 const code = "03fa7d89-75bb-4125-bf9f-6d4ac9f66b13";
-(async () => {
-  try {
-    const accessToken = await getAccessToken(code);
-    console.log(accessToken);
-    console.log(await getAccessablePageId(accessToken));
-  } catch (error) {
-    console.error("Failed: ", error);
-  }
-})();
 
 async function getAccessToken(code) {
   try {

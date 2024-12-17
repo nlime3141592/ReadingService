@@ -41,9 +41,8 @@ window.onload = function () {
   const eventData = JSON.parse(localStorage.getItem("event"));
   if (eventData) {
     const { function: funcName, mode } = eventData;
-    if (funcName === "initBookList" && mode) {
+    if (funcName == "initBookList" && mode != null) {
       switch (mode) {
-        default:
         case 0:
           getHome();
           break;
@@ -56,6 +55,8 @@ window.onload = function () {
       }
     }
     localStorage.removeItem("event"); // 실행 후 삭제
+  } else {
+    getHome();
   }
   const urlParams = new URLSearchParams(window.location.search);
   const jwe = urlParams.get("jwe");
@@ -86,7 +87,7 @@ async function getRecommend() {
   mode = 1;
   pageNum = 0;
   // 서버에서 추천 받기
-  isbnList[mode] = (await fetch(`/search/by-recommendation`)).json();
+  isbnList[mode] = await (await fetch(`/search/by-recommendation`)).json();
   getNextPage(+1);
   setStatus("추천 도서");
 }
@@ -96,7 +97,7 @@ async function getRecord() {
   mode = 2;
   pageNum = 0;
   // notion 에서 리스트 가져오기
-  isbnList[mode] = (await fetch(`/search/by-history`)).json();
+  isbnList[mode] = await (await fetch(`/search/by-history`)).json();
   getNextPage(+1);
   setStatus("독서 기록");
 }
@@ -110,13 +111,17 @@ async function getSearch() {
   setStatus(`검색: ${searchKeyword}`);
 }
 
+function setStatus(string) {
+  statusText.textContent = string;
+}
+
 /**
  * 페이지 버튼에 의한 책 목록 변경
  * @param {Number} dir 페이지 버튼 방향 - {-1: 이전, 1: 다음}
  */
 async function getNextPage(dir) {
   if (pageNum + dir != 0) {
-    const bookList = getBookList(pageNum);
+    const bookList = await getBookList(pageNum + dir);
     if (bookList && bookList.length > 0) {
       setBookShelf(bookList);
       pageNum += dir;
@@ -151,7 +156,7 @@ async function getBookList(pageNum) {
           // DB에서 특정 ISBN에 대한 bookInfo의 요청
           const response_record = await fetch(`/search/by-isbn13/${isbn}`);
           // 결과를 bookList에 저장
-          bookList.push(await response.json());
+          bookList.push(await response_record.json());
         }
       }
       break;
@@ -161,6 +166,7 @@ async function getBookList(pageNum) {
         `/search/by-keyword/${searchKeyword}?pageNum=${pageNum}&booksPerPage=${BOOKS_PER_PAGE}`
       );
       bookList = await response_search.json();
+      break;
     default:
       console.log("Invalid page mode");
       break;
@@ -178,7 +184,7 @@ function setBookShelf(bookList) {
   }
 
   if (Array.isArray(bookList)) {
-    for (let i = 1; i <= 12; i++) {
+    for (let i = 1; i <= BOOKS_PER_PAGE; i++) {
       let bookSlot = document.getElementById(`book-slot-${i}`);
       if (i <= bookList.length) {
         let book = bookList[i - 1];
@@ -214,4 +220,8 @@ function setBook(bookSlot, book) {
       : "Unknown Author";
 
   bookAuthor.textContent = author;
+
+  bookSlot.onclick = () => {
+    window.location.href = `/detail?isbn=${book["isbn13"]}`;
+  };
 }

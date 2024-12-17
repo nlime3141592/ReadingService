@@ -11,15 +11,6 @@ const headers = {
 const pageId = "1479ede653a980c5aa9fe6f2109c4612";
 const isbn = "testISBN";
 
-(async () => {
-  try {
-    const updateResult = await updateBookRank(pageId, isbn, "😙"); // await 추가
-    console.log(updateResult);
-  } catch (error) {
-    console.error("Failed: ", error);
-  }
-})();
-
 async function updateBookRank(pageId, isbn, rank) {
   const tupleId = await getTupleByISBN.getTuple(pageId, isbn, rank);
   const updateResult = await updateTuple(tupleId, rank);

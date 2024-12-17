@@ -199,7 +199,7 @@ body {
   margin-bottom: 10px;
 }
 
-#status-current {
+#status-text {
   font-size: clamp(8px, 5vh, 24px);
   font-weight: 200;
   color: #e8e7e2;
