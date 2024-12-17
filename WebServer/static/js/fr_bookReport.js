@@ -28,8 +28,7 @@ init();
 async function init() {
   const urlParams = new URLSearchParams(window.location.search);
   const isbn = urlParams.get("isbn");
-  // isbn으로 책 정보를 가져옴
-  const response_isbn = await fetch(``);
+  const response_isbn = await fetch(`/search/by-isbn13/${isbn}`);
   const bookInfo = await response_isbn.json();
 
   document.querySelector("#book-info-image").src = bookInfo["cover"];
@@ -45,7 +44,7 @@ function goBookList(mode) {
     "event",
     JSON.stringify({ function: "initBookList", mode: mode })
   );
-  window.location = "/main";
+  window.location = "/";
 }
 
 /**
@@ -54,6 +53,26 @@ function goBookList(mode) {
 function test() {
   const richText = document.getElementsByClassName("ql-editor")[0];
   console.log(htmlToNotion(richText));
+}
+
+async function submit() {
+  const richText = htmlToNotion(
+    document.getElementsByClassName("ql-editor")[0]
+  );
+  const responseUploadReport = await fetch(``, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(richText),
+  });
+  if (responseUploadReport.ok) {
+    window.alert("등록되었습니다.");
+    // 등록 완료 후 메인 화면으로 이동
+    goBookList(0);
+  } else {
+    window.alert("오류가 발생하였습니다. 다시 시도해주세요.");
+  }
 }
 
 /**

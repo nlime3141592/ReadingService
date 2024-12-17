@@ -11,5 +11,5 @@ function __init(app)
 
 function __get_main(req, res)
 {
-    res.sendFile(utility.getHtmlPath("./index.html"))
+    res.sendFile(utility.getHtmlPath("./fr_main.html"))
 }

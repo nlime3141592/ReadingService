@@ -4,9 +4,13 @@ module.exports = {
     getHtmlPath: __getHtmlPath,
     // getHtmlAsync: __getHtmlAsync, // NOTE: Deprecated.
     printLog: __printLog,
-    printLogWithName: __printLogWithName
+    printLogWithName: __printLogWithName,
+
+    getPythonPath: __getPythonPath,
+    execPromise: __execPromise
 }
 
+const { exec } = require("child_process")
 const path = require("path")
 const fs = require("fs").promises
 
@@ -41,4 +45,28 @@ function __printLogWithName(message, name)
     messageFormat = `${nameFormat} ${message}`
 
     __printLog(messageFormat)
+}
+
+function __getPythonPath(relpath)
+{
+    let rootDirectory = path.resolve("../WordAI")
+    let relpathFromProject = rootDirectory + "/" + relpath
+    relpathFromProject = relpathFromProject.replace("//", "/")
+    return path.resolve(relpathFromProject)
+}
+
+function __execPromise(command)
+{
+    return new Promise((resolve, reject) => {
+        exec(command, (error, stdout, stderr) => {
+            if (error) {
+                // reject(error)
+                reject(false)
+                return
+            }
+
+            // resolve({ stdout, stderr })
+            resolve(true)
+        })
+    })
 }
