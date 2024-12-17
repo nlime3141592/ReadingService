@@ -52,7 +52,13 @@ async function getAccessablePageId(token) {
     return false;
   }
   const data = await res.json();
-  return data.results[0]?.id || null;
+  let pageId = null;
+  data["results"].forEach((element) => {
+    if (element["parent"]["type"] == "workspace") {
+      pageId = element["id"];
+    }
+  });
+  return pageId;
 }
 
 module.exports = { verifyJWE, getAccessablePageId };

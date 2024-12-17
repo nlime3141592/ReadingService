@@ -10,9 +10,8 @@ const headers = {
 async function getTuple(token, pageId, isbn) {
   headers["Authorization"] = token;
   let tupleId = null;
-
   const databaseId = await getDatabaseId.getDatabaseId(token, pageId);
-  const foundResult = await foundISBN(databaseId, isbn);
+  const foundResult = await foundISBN(token, databaseId, isbn);
   if (foundResult["results"][0]) {
     tupleId = foundResult["results"][0]["id"];
   } else {
@@ -23,7 +22,8 @@ async function getTuple(token, pageId, isbn) {
   return tupleId;
 }
 
-function foundISBN(databaseId, isbn) {
+function foundISBN(token, databaseId, isbn) {
+  headers["Authorization"] = token;
   const bodyData = {
     filter: {
       property: "ISBN",
@@ -85,4 +85,4 @@ async function createTuple(database_id, isbn) {
     });
 }
 
-module.exports = { getTuple };
+module.exports = { getTuple, foundISBN };

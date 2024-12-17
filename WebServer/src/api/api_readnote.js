@@ -11,7 +11,9 @@ function __init(app) {
   app.post("/readnote/upload", __post_readnote_upload);
 }
 
-function __readnote(req, res) {}
+function __readnote(req, res) {
+  res.sendFile(utility.getHtmlPath("./fr_bookReport.html"));
+}
 
 async function __post_readnote_upload(req, res) {
   try {

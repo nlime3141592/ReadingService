@@ -10,7 +10,6 @@ let searchKeyword = "";
 let mode = 0; // 0: 메인, 1: 추천, 2: 독서 기록, 3: 검색 기록
 
 const statusText = document.getElementById("status-text");
-
 const homeButton = document.getElementById("btn-home");
 const recommendButton = document.getElementById("btn-recommend");
 const recordButton = document.getElementById("btn-record");

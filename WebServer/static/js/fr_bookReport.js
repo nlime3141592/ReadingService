@@ -7,6 +7,12 @@ const submitButton = document.getElementById("btn-done");
 
 submitButton.onclick = submit;
 
+const loginButton = document.getElementById("login-button");
+loginButton.onclick = () => {
+  const loginPage = `https://api.notion.com/v1/oauth/authorize?client_id=15ed872b-594c-80f0-ab76-0037de8dd2b4&response_type=code&owner=user&redirect_uri=https%3A%2F%2Flocalhost%3A8443%2Fjwe%2Fcreate`;
+  window.location.href = loginPage;
+};
+
 // 네비게이션 바
 const homeButton = document.getElementById("btn-home");
 const recommendButton = document.getElementById("btn-recommend");
@@ -22,32 +28,31 @@ recordButton.onclick = () => {
   goBookList(2);
 };
 
-init();
-
-/**
- * 초기화용 함수
- */
-async function init() {
+window.onload = async function () {
+  await isLogined();
   const urlParams = new URLSearchParams(window.location.search);
   const isbn = urlParams.get("isbn");
-  const response_isbn = await fetch(`/search/by-isbn13/${isbn}`);
-  const bookInfo = await response_isbn.json();
+  setBook(isbn);
+};
 
-  document.querySelector("#book-info-image").src = bookInfo["cover"];
-  document.querySelector("#book-info-text").textContent = bookInfo["title"];
-
-  // jwe 토큰 verify하는 경로 필요
-  const verifyResult = storedJWE
-    ? await fetch(``, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ jwe: storedJWE }),
-      })
-    : false;
-  if (verifyResult && !verifyResult.ok) {
-    window.alert("Notion에 다시 로그인해주세요.");
-    sessionStorage.removeItem("jweToken");
-    goBookList(0);
+async function isLogined() {
+  let logined = false;
+  if (storedJWE != null) {
+    const verifyResult = await fetch(`/jwe/verify`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        jwe: storedJWE,
+      }),
+    });
+    if (verifyResult.ok) logined = true;
+    else console.error("JWE 검증 실패:", await verifyResult.text());
+  }
+  if (logined) {
+    document.querySelector("#btn-recommend").classList.remove("hide");
+    document.querySelector("#btn-record").classList.remove("hide");
+    document.querySelector("#btn-done").classList.remove("hide");
+    document.querySelector("#login-button").classList.add("hide");
   }
 }
 
@@ -61,6 +66,12 @@ function goBookList(mode) {
     JSON.stringify({ function: "initBookList", mode: mode })
   );
   window.location = "/";
+}
+
+async function setBook(isbn) {
+  const bookInfo = await (await fetch(`/search/by-isbn13/${isbn}`)).json();
+  document.querySelector("#book-info-image").src = bookInfo["cover"];
+  document.querySelector("#book-info-text").textContent = bookInfo["title"];
 }
 
 async function submit() {
