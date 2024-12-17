@@ -2,7 +2,10 @@ const fs = require("fs");
 const crypto = require("crypto");
 const jose = require("jose");
 
-const publicKeyPem = fs.readFileSync("public.pem", "utf-8");
+const publicKeyPem = fs.readFileSync(
+  "C:\\Programming\\web\\ssl\\public.pem",
+  "utf-8"
+);
 const publicKey = crypto.createPublicKey(publicKeyPem);
 
 async function createJWE(token) {

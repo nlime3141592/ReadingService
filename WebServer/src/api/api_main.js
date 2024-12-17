@@ -1,15 +1,13 @@
 module.exports = {
-    init: __init
+  init: __init,
+};
+
+const utility = require("../utility.js");
+
+function __init(app) {
+  app.get("/", __get_main);
 }
 
-const utility = require("../utility.js")
-
-function __init(app)
-{
-    app.get("/", __get_main)
-}
-
-function __get_main(req, res)
-{
-    res.sendFile(utility.getHtmlPath("./fr_main.html"))
+function __get_main(req, res) {
+  res.sendFile(utility.getHtmlPath("./fr_main.html"));
 }

@@ -26,6 +26,15 @@ userRankButton.onclick = () => {
   setUserRank();
 };
 
+window.onload = async function () {
+  const urlParams = new URLSearchParams(window.location.search);
+  const isbn = urlParams.get("isbn");
+  setBook(isbn);
+  await isLogined();
+};
+
+async function isLogined() {}
+
 /**
  * 네비게이션 바에서 이동을 위해 로컬 저장소에 mode를 저장
  * @param {Number} mode 이동하고자 하는 책 목록 화면 - {0: 메인, 1: 추천, 2: 기록}
@@ -35,7 +44,7 @@ function goBookList(mode) {
     "event",
     JSON.stringify({ function: "initBookList", mode: mode })
   );
-  window.location = "/main";
+  window.location = "/";
 }
 
 function setUserRank() {
@@ -50,9 +59,10 @@ function setUserRank() {
 
 /**
  * 책 설명을 설정
- * @param {JSON} bookInfo JSON 형식의 book info
+ * @param {*} isbn isbn번호
  */
-function setBookDetail(bookInfo) {
+async function setBook(isbn) {
+  const bookInfo = await (await fetch(`/search/by-isbn13/${isbn}`)).json();
   setBookTitleSlot(bookInfo);
   setBookDetail(bookInfo);
   setBottomGrid(bookInfo);

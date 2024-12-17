@@ -2,7 +2,10 @@ const fs = require("fs");
 const crypto = require("crypto");
 const jose = require("jose");
 
-const privateKeyPem = fs.readFileSync("private.pem", "utf-8");
+const privateKeyPem = fs.readFileSync(
+  "C:\\Programming\\web\\ssl\\private.pem",
+  "utf-8"
+);
 const privateKey = crypto.createPrivateKey(privateKeyPem);
 
 async function verifyJWE(jwe) {

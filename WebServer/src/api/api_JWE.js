@@ -2,9 +2,9 @@ module.exports = {
   init: __init,
 };
 
-const createJWE = require("../../../JWE/createJWE.js");
-const verifyJWE = require("../../../JWE/verifyJWE.js");
-const getAccessToken = require("../../../NotionAPI/login/getAccessToken.js");
+const createJWE = require("../../JWE/createJWE.js");
+const verifyJWE = require("../../JWE/verifyJWE.js");
+const getAccessToken = require("../../NotionAPI/login/getAccessToken.js");
 
 function __init(app) {
   app.post("/jwe/verify", __post_jwe_verify);

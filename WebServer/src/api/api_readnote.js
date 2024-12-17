@@ -3,8 +3,8 @@ module.exports = {
 };
 
 const utility = require("../utility.js");
-const addBookReport = require("../../../NotionAPI/book/addBookReport.js");
-const verifyJWE = require("../../../JWE/verifyJWE.js");
+const addBookReport = require("../../NotionAPI/book/addBookReport.js");
+const verifyJWE = require("../../JWE/verifyJWE.js");
 
 function __init(app) {
   app.get("/readnote", __readnote);

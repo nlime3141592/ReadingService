@@ -9,16 +9,6 @@ const headers = {
 // 페이지 Id - 후에 OAuth로 받아야 할 부분
 const pageId = "1479ede653a980c5aa9fe6f2109c4612";
 
-// test 부분
-(async () => {
-  // try {
-  //   const databaseId = await getDatabaseId(pageId); // await 추가
-  //   console.log("Database ID:", databaseId);
-  // } catch (error) {
-  //   console.error("Failed to get Database ID:", error);
-  // }
-})();
-
 // 페이지 내의 데이터베이스 검색 - 있으면 Id 반환, 없으면 생성 후 반환
 async function getDatabaseId(pageId) {
   const checkResult = await checkDatabase(pageId);
