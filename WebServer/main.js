@@ -61,6 +61,11 @@ async function main()
       utility.printLogWithName("서버가 정상적으로 종료되었습니다.", "System")
       process.exit(0)
     })
+
+    setTimeout(() => {
+      utility.printLogWithName("서버가 종료되지 않아 강제 종료되었습니다.", "System")
+      process.exit(1)
+    }, 5000)
   })
 }
 
