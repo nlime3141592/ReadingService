@@ -16,6 +16,10 @@ const api_readnote = require("./src/api/api_readnote.js");
 // NOTE: 상수
 const c_NUM_PORT = 8080;
 
+const privateKey = fs.readFileSync("C:\\Programming\\web\\ssl\\private-key.pem", "utf8")
+const certificate = fs.readFileSync("C:\\Programming\\web\\ssl\\certificate.pem", "utf8")
+const credentials = { key: privateKey, cert: certificate }
+
 // NOTE: 전역 변수
 const app = express();
 

@@ -27,16 +27,12 @@ function __get_search_all(req, res)
     utility.printLog("검색 요청 처리 완료 (전체)")
 }
 
-function __get_search_by_isbn13(req, res)
+async function __get_search_by_isbn13(req, res)
 {
     let { isbn13 } = req.params
-    let { pageNum, booksPerPage } = req.query
 
-    jsonPages = dbQuery.query_page_from_isbn13(isbn13, pageNum, booksPerPage)
-    jsonPages = {
-        "test-json": "please-this-json-remove-after-test"
-    }
-    res.send(JSON.stringify(jsonPages))
+    jsonObject = await dbQuery.query_book_info_by_isbn13(isbn13)
+    res.send(JSON.stringify(jsonObject))
 
     utility.printLog("검색 요청 처리 완료 (isbn13)")
 }
