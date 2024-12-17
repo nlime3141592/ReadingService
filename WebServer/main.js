@@ -1,6 +1,10 @@
+// NOTE: 환경 변수를 임포트합니다.
+require("dotenv").config();
+
 // NOTE: 외부 모듈을 임포트합니다.
 const express = require("express");
 const https = require("https");
+const http = require("http");
 const fs = require("fs");
 
 // NOTE: 본 프로젝트에서 구현한 모듈(소스 코드)을 임포트합니다.
@@ -17,7 +21,8 @@ const api_detail = require("./src/api/api_detail.js");
 const api_JWE = require("./src/api/api_JWE.js");
 
 // NOTE: 상수
-const c_NUM_PORT = 8080;
+const c_NUM_PORT_HTTP = 8080; // HTTP 포트
+const c_NUM_PORT_HTTPS = 8443; // HTTPS 포트
 
 // NOTE: https 서버 인증을 위한 키
 const privateKey = fs.readFileSync(
@@ -47,13 +52,34 @@ async function main() {
 
   await db_connection.init();
 
-  // NOTE: 서버를 열고 클라이언트 요청 발생을 대기합니다. (https 서버)
-  const server = https.createServer(credentials, app).listen(c_NUM_PORT, () => {
+  // NOTE: HTTP 서버 생성 및 리디렉션 설정
+  const httpServer = http.createServer((req, res) => {
+    res.writeHead(301, {
+      Location: `https://${req.headers.host.replace(
+        /:\d+/,
+        `:${c_NUM_PORT_HTTPS}`
+      )}${req.url}`,
+    });
+    res.end();
+  });
+
+  // NOTE: HTTP 서버 리스닝
+  httpServer.listen(c_NUM_PORT_HTTP, () => {
     utility.printLogWithName(
-      `서버를 시작합니다. (http://localhost:${c_NUM_PORT})`,
+      `HTTP 서버가 ${c_NUM_PORT_HTTP} 포트에서 실행 중입니다.`,
       "System"
     );
   });
+
+  // NOTE: HTTPS 서버를 열고 클라이언트 요청 발생을 대기합니다.
+  const httpsServer = https
+    .createServer(credentials, app)
+    .listen(c_NUM_PORT_HTTPS, () => {
+      utility.printLogWithName(
+        `HTTPS 서버가 ${c_NUM_PORT_HTTPS} 포트에서 실행 중입니다.`,
+        "System"
+      );
+    });
   /*
   // NOTE: 서버를 열고 클라이언트 요청 발생을 대기합니다. (http 서버)
   const server = app.listen(c_NUM_PORT, () => {

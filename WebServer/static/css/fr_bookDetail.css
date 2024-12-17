@@ -6,6 +6,10 @@
   border-radius: 20px;
 }
 
+.hide {
+  display: none !important;
+}
+
 body {
   background-color: #2f2b28;
   margin: 0;
@@ -330,8 +334,4 @@ body {
 
 .login-button div {
   margin-bottom: 10px;
-}
-
-.hide {
-  display: none;
 }

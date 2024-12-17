@@ -1,6 +1,6 @@
 console.log("load bookReport.js");
 
-let storedJWE = localStorage.getItem("jweToken");
+let storedJWE = sessionStorage.getItem("jweToken");
 
 // 감상문 등록 버튼
 const submitButton = document.getElementById("btn-done");
@@ -46,7 +46,7 @@ async function init() {
     : false;
   if (verifyResult && !verifyResult.ok) {
     window.alert("Notion에 다시 로그인해주세요.");
-    localStorage.removeItem("jweToken");
+    sessionStorage.removeItem("jweToken");
     goBookList(0);
   }
 }
@@ -56,7 +56,7 @@ async function init() {
  * @param {Number} mode 이동하고자 하는 책 목록 화면 - {0: 메인, 1: 추천, 2: 기록}
  */
 function goBookList(mode) {
-  localStorage.setItem(
+  sessionStorage.setItem(
     "event",
     JSON.stringify({ function: "initBookList", mode: mode })
   );

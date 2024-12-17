@@ -1,9 +1,14 @@
 console.log("load bookDetail.js");
 
-let storedJWE = localStorage.getItem("jweToken");
+let storedJWE = sessionStorage.getItem("jweToken");
+
+const userRankButton = document.getElementById("user-rank-button");
 
 const loginButton = document.getElementById("login-button");
-const userRankButton = document.getElementById("user-rank-button");
+loginButton.onclick = () => {
+  const loginPage = `https://api.notion.com/v1/oauth/authorize?client_id=15ed872b-594c-80f0-ab76-0037de8dd2b4&response_type=code&owner=user&redirect_uri=https%3A%2F%2Flocalhost%3A8443%2Fjwe%2Fcreate`;
+  window.location.href = loginPage;
+};
 
 // 네비게이션 바
 const homeButton = document.getElementById("btn-home");
@@ -27,20 +32,40 @@ userRankButton.onclick = () => {
 };
 
 window.onload = async function () {
+  await isLogined();
   const urlParams = new URLSearchParams(window.location.search);
   const isbn = urlParams.get("isbn");
   setBook(isbn);
-  await isLogined();
 };
 
-async function isLogined() {}
+async function isLogined() {
+  let logined = false;
+  if (storedJWE != null) {
+    const verifyResult = await fetch(`/jwe/verify`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        jwe: storedJWE,
+      }),
+    });
+    if (verifyResult.ok) logined = true;
+    else console.error("JWE 검증 실패:", await verifyResult.text());
+  }
+  if (logined) {
+    document.querySelector("#btn-recommend").classList.remove("hide");
+    document.querySelector("#btn-record").classList.remove("hide");
+    document.querySelector("#reading-note").classList.remove("hide");
+    document.querySelector("#user-rank").classList.remove("hide");
+    document.querySelector("#login-button").classList.add("hide");
+  }
+}
 
 /**
  * 네비게이션 바에서 이동을 위해 로컬 저장소에 mode를 저장
  * @param {Number} mode 이동하고자 하는 책 목록 화면 - {0: 메인, 1: 추천, 2: 기록}
  */
 function goBookList(mode) {
-  localStorage.setItem(
+  sessionStorage.setItem(
     "event",
     JSON.stringify({ function: "initBookList", mode: mode })
   );

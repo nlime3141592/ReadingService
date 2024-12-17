@@ -2,15 +2,13 @@ const axios = require("axios");
 
 // header에 api key와 notion version 명시
 const headers = {
-  Authorization: "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",
+  Authorization: "사용자 Token 들어가야함",
   "Notion-Version": "2022-06-28",
 };
 
-// 페이지 Id - 후에 OAuth로 받아야 할 부분
-const pageId = "1479ede653a980c5aa9fe6f2109c4612";
-
 // 페이지 내의 데이터베이스 검색 - 있으면 Id 반환, 없으면 생성 후 반환
-async function getDatabaseId(pageId) {
+async function getDatabaseId(token, pageId) {
+  headers["Authorization"] = token;
   const checkResult = await checkDatabase(pageId);
   let databaseId = null;
   checkResult["results"].forEach((element) => {

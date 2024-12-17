@@ -3,16 +3,13 @@ const getTupleByISBN = require("./getTupleByISBN");
 
 // header에 api key와 notion version 명시
 const headers = {
-  Authorization: "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",
+  Authorization: "사용자 Token 들어가야함",
   "Notion-Version": "2022-06-28",
 };
 
-// 페이지 Id - 후에 OAuth로 받아야 할 부분
-const pageId = "1479ede653a980c5aa9fe6f2109c4612";
-const isbn = "testISBN";
-
-async function updateBookRank(pageId, isbn, rank) {
-  const tupleId = await getTupleByISBN.getTuple(pageId, isbn, rank);
+async function updateBookRank(token, pageId, isbn, rank) {
+  headers["Authorization"] = token;
+  const tupleId = await getTupleByISBN.getTuple(token, pageId, isbn, rank);
   const updateResult = await updateTuple(tupleId, rank);
   return updateResult;
 }
@@ -37,3 +34,5 @@ function updateTuple(tupleId, rank) {
       throw error;
     });
 }
+
+module.exports = { updateBookRank };

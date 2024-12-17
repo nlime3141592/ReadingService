@@ -5,8 +5,6 @@ const headers = {
   Authorization: "사용자 Token 들어가야함",
   "Notion-Version": "2022-06-28",
 };
-const pageId = "접근 가능한 사용자 pageId";
-const isbn = "작성한 책의 ISBN";
 
 /**
  *
@@ -15,8 +13,9 @@ const isbn = "작성한 책의 ISBN";
  * @param {JSON} reportJson 등록될 감상문 - report 페이지에서 생성되는거 그대로 주면됨
  * @returns response 받음 - 200이면 ok
  */
-async function addBookReport(pageId, isbn, reportJson) {
-  const tupleId = await getTupleByISBN.getTuple(pageId, isbn);
+async function addBookReport(token, pageId, isbn, reportJson) {
+  headers["Authorization"] = token;
+  const tupleId = await getTupleByISBN.getTuple(token, pageId, isbn);
   const addReportResult = await addReport(tupleId, reportJson);
   return addReportResult;
 }
@@ -58,3 +57,5 @@ function addWritingTime(reportJson) {
   });
   return reportJson;
 }
+
+module.exports = { addBookReport };

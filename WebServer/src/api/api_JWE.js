@@ -8,23 +8,22 @@ const getAccessToken = require("../../NotionAPI/login/getAccessToken.js");
 
 function __init(app) {
   app.post("/jwe/verify", __post_jwe_verify);
-  app.get("/jwe/create/:code", __get_jwe_create);
+  app.get("/jwe/create", __get_jwe_create);
 }
 
 async function __post_jwe_verify(req, res) {
   const requestBody = req.body;
   const token = await verifyJWE.verifyJWE(requestBody["jwe"]);
   if (!token) return res.status(400).send("Invalid JWE");
-  else return res.status(200);
+  else return res.status(200).send("valid JWE");
 }
 
 async function __get_jwe_create(req, res) {
   try {
     let { code } = req.query;
-
     const token = await getAccessToken.getAccessToken(code);
     if (!token) {
-      return res.status(400).send("Failed to obtain access token.");
+      return res.redirect("/");
     }
     const jwe = await createJWE.createJWE(token);
 
@@ -33,6 +32,6 @@ async function __get_jwe_create(req, res) {
     res.redirect(redirectUrl);
   } catch (error) {
     console.error("Error in __get_jwe_create:", error);
-    res.status(500).send("Internal Server Error");
+    res.redirect("/");
   }
 }

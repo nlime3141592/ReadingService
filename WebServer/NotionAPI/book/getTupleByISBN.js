@@ -3,14 +3,15 @@ const getDatabaseId = require("./getDatabaseId");
 
 // header에 api key와 notion version 명시
 const headers = {
-  Authorization: "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",
+  Authorization: "사용자 Token 들어가야함",
   "Notion-Version": "2022-06-28",
 };
 
-async function getTuple(pageId, isbn) {
+async function getTuple(token, pageId, isbn) {
+  headers["Authorization"] = token;
   let tupleId = null;
 
-  const databaseId = await getDatabaseId.getDatabaseId(pageId);
+  const databaseId = await getDatabaseId.getDatabaseId(token, pageId);
   const foundResult = await foundISBN(databaseId, isbn);
   if (foundResult["results"][0]) {
     tupleId = foundResult["results"][0]["id"];
@@ -84,4 +85,4 @@ async function createTuple(database_id, isbn) {
     });
 }
 
-module.exports = { getTuple, foundISBN };
+module.exports = { getTuple };
