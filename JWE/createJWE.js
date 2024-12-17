@@ -18,3 +18,5 @@ async function createJWE(token) {
 
   return jwe;
 }
+
+module.exports = { createJWE };

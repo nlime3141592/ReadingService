@@ -1,9 +1,11 @@
 console.log("load bookReport.js");
 
+const storedJWE = localStorage.getItem("jweToken");
+
+// 감상문 등록 버튼
 const submitButton = document.getElementById("btn-done");
 
-// 미구현 - Notion으로 올리는 함수 필요
-submitButton.onclick = test;
+submitButton.onclick = submit;
 
 // 네비게이션 바
 const homeButton = document.getElementById("btn-home");
@@ -33,6 +35,11 @@ async function init() {
 
   document.querySelector("#book-info-image").src = bookInfo["cover"];
   document.querySelector("#book-info-text").textContent = bookInfo["title"];
+
+  if (storedJWE == null) {
+    window.alert("Notion에 다시 로그인해주세요.");
+    goBookList(0);
+  }
 }
 
 /**
@@ -47,14 +54,6 @@ function goBookList(mode) {
   window.location = "/";
 }
 
-/**
- * 변환 확인용 테스트 함수
- */
-function test() {
-  const richText = document.getElementsByClassName("ql-editor")[0];
-  console.log(htmlToNotion(richText));
-}
-
 async function submit() {
   const richText = htmlToNotion(
     document.getElementsByClassName("ql-editor")[0]
@@ -64,7 +63,11 @@ async function submit() {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(richText),
+    body: {
+      jwe: storedJWE,
+      isbn: urlParams.get("isbn"),
+      report: JSON.stringify(richText),
+    },
   });
   if (responseUploadReport.ok) {
     window.alert("등록되었습니다.");

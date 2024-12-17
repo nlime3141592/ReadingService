@@ -8,38 +8,6 @@ const headers = {
 const pageId = "접근 가능한 사용자 pageId";
 const isbn = "작성한 책의 ISBN";
 
-testReport = {
-  children: [
-    {
-      object: "block",
-      type: "paragraph",
-      paragraph: {
-        rich_text: [
-          {
-            text: {
-              content:
-                "테스트용 JSON, 후에 Report HTML 에서 생성되는 JSON으로만 바꾸면 됨",
-            },
-            annotations: {
-              bold: false,
-              underline: false,
-              italic: false,
-            },
-          },
-        ],
-      },
-    },
-  ],
-};
-
-(async () => {
-  try {
-    console.log(await addBookReport(pageId, isbn, testReport));
-  } catch (error) {
-    console.error("Failed: ", error);
-  }
-})();
-
 /**
  *
  * @param {string} pageId 독후감이 작성될 notion page id
