@@ -1,5 +1,7 @@
 console.log("load bookDetail.js");
 
+let storedJWE = localStorage.getItem("jweToken");
+
 const loginButton = document.getElementById("login-button");
 const userRankButton = document.getElementById("user-rank-button");
 

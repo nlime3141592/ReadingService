@@ -6,6 +6,7 @@ const privateKeyPem = fs.readFileSync("private.pem", "utf-8");
 const privateKey = crypto.createPrivateKey(privateKeyPem);
 
 async function verifyJWE(jwe) {
+  if (typeof jwe != String) return false;
   // JWE 복호화
   const { plaintext, _ } = await jose.compactDecrypt(jwe, privateKey);
 

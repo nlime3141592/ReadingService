@@ -8,12 +8,12 @@ const verifyJWE = require("../../../JWE/verifyJWE.js");
 
 function __init(app) {
   app.get("/readnote", __readnote);
-  app.post("/readnote/upload", __readnote_upload);
+  app.post("/readnote/upload", __post_readnote_upload);
 }
 
 function __readnote(req, res) {}
 
-async function __readnote_upload(req, res) {
+async function __post_readnote_upload(req, res) {
   try {
     const requestBody = req.body;
 

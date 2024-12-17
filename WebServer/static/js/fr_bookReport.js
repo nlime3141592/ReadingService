@@ -1,6 +1,6 @@
 console.log("load bookReport.js");
 
-const storedJWE = localStorage.getItem("jweToken");
+let storedJWE = localStorage.getItem("jweToken");
 
 // 감상문 등록 버튼
 const submitButton = document.getElementById("btn-done");
@@ -36,8 +36,17 @@ async function init() {
   document.querySelector("#book-info-image").src = bookInfo["cover"];
   document.querySelector("#book-info-text").textContent = bookInfo["title"];
 
-  if (storedJWE == null) {
+  // jwe 토큰 verify하는 경로 필요
+  const verifyResult = storedJWE
+    ? await fetch(``, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jwe: storedJWE }),
+      })
+    : false;
+  if (verifyResult && !verifyResult.ok) {
     window.alert("Notion에 다시 로그인해주세요.");
+    localStorage.removeItem("jweToken");
     goBookList(0);
   }
 }
@@ -58,7 +67,7 @@ async function submit() {
   const richText = htmlToNotion(
     document.getElementsByClassName("ql-editor")[0]
   );
-  const responseUploadReport = await fetch(``, {
+  const responseUploadReport = await fetch(`/readnote/upload`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
