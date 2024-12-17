@@ -23,17 +23,7 @@ async function __query_page_from_all_books(pageNum, booksPerPage)
         .limit(booksPerPage)
         .toArray()
 
-    if (batch.length === 0) 
-    {
-        utility.printLogWithName("No data gets.", "dbQuery")
-    }
-    else
-    {
-        for (let result of batch)
-        {
-            utility.printLogWithName(JSON.stringify(result), "dbQuery")
-        }
-    }
+    return batch
 }
 
 async function __query_book_info_by_isbn13(isbn13)
@@ -61,30 +51,33 @@ async function __query_book_info_by_isbn13(isbn13)
 async function __query_page_from_keyword(keyword, pageNum, booksPerPage)
 {
     const dbBook = db_connection.get_db("book")
-    const sourceCollection = dbBook.collection("bookisbn")
+    const sourceCollection = dbBook.collection("bookinfo")
 
     keywordList = keyword.split(" ")
 
     booksPerPage = Number(booksPerPage)
     let skipBookNum = pageNum * booksPerPage
 
-    const query = {}
+    const query = {
+        $or: []
+    }
+
+    for (let key of keywordList)
+    {
+        query["$or"].push({
+            title: { $regex: `.*${key}*.`}
+        })
+
+        query["$or"].push({
+            author: { $regex: `.*${key}*.`}
+        })
+    }
+
     const batch = await sourceCollection
         .find(query)
-        // .sort({ _id: 1 })
         .skip(skipBookNum)
         .limit(booksPerPage)
         .toArray()
 
-    if (batch.length === 0) 
-    {
-        utility.printLogWithName("No data gets.", "dbQuery")
-    }
-    else
-    {
-        for (let result of batch)
-        {
-            utility.printLogWithName(JSON.stringify(result), "dbQuery")
-        }
-    }
+    return batch
 }

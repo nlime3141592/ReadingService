@@ -14,41 +14,44 @@ function __init(app)
     app.get("/search/by-history", __get_search_by_history)
 }
 
-function __get_search_all(req, res)
+// NOTE: OK.
+async function __get_search_all(req, res)
 {
     let { pageNum, booksPerPage } = req.query
 
-    jsonPages = dbQuery.query_page_from_all_books(pageNum, booksPerPage)
-    jsonPages = {
-        "test-json": "please-this-json-remove-after-test"
-    }
-    res.send(JSON.stringify(jsonPages))
+    bookList = await dbQuery.query_page_from_all_books(pageNum, booksPerPage)
+    res.send(JSON.stringify(bookList))
 
-    utility.printLog("검색 요청 처리 완료 (전체)")
+    if (bookList.length === 0)
+        utility.printLogWithName("검색 요청 결과 없음 (전체)", "Search API")
+    else
+        utility.printLogWithName("검색 요청 처리 완료 (전체)", "Search API")
 }
 
+// NOTE: OK.
 async function __get_search_by_isbn13(req, res)
 {
     let { isbn13 } = req.params
 
-    jsonObject = await dbQuery.query_book_info_by_isbn13(isbn13)
-    res.send(JSON.stringify(jsonObject))
+    jsonBook = await dbQuery.query_book_info_by_isbn13(isbn13)
+    res.send(JSON.stringify(jsonBook))
 
-    utility.printLog("검색 요청 처리 완료 (isbn13)")
+    utility.printLogWithName("검색 요청 처리 완료 (isbn13)", "Search API")
 }
 
-function __get_search_by_keyword(req, res)
+// NOTE: OK.
+async function __get_search_by_keyword(req, res)
 {
     let { keyword } = req.params
     let { pageNum, booksPerPage } = req.query
 
-    jsonPages = dbQuery.query_page_from_keyword(keyword, pageNum, booksPerPage)
-    jsonPages = {
-        "test-json": "please-this-json-remove-after-test"
-    }
-    res.send(JSON.stringify(jsonPages))
+    bookList = await dbQuery.query_page_from_keyword(keyword, pageNum, booksPerPage)
+    res.send(JSON.stringify(bookList))
 
-    utility.printLog("검색 요청 처리 완료 (키워드 검색)")
+    if (bookList.length === 0)
+        utility.printLogWithName("검색 요청 결과 없음 (키워드 검색)", "Search API")
+    else
+        utility.printLogWithName("검색 요청 처리 완료 (키워드 검색)", "Search API")
 }
 
 async function __get_search_by_recommendation(req, res)
@@ -64,9 +67,9 @@ async function __get_search_by_recommendation(req, res)
     let execSuccess = await utility.execPromise(command)
 
     if (execSuccess === true)
-        utility.printLog("검색 요청 처리 완료 (추천 도서)")
+        utility.printLogWithName("검색 요청 처리 완료 (추천 도서)", "Search API")
     else
-        utility.printLog("검색 요청 처리 실패 (추천 도서)")
+        utility.printLogWithName("검색 요청 처리 실패 (추천 도서)", "Search API")
 }
 
 function __get_search_by_history(req, res)
@@ -76,5 +79,5 @@ function __get_search_by_history(req, res)
     }
     res.send(JSON.stringify(jsonPages))
 
-    utility.printLog("검색 요청 처리 완료 (독서 기록)")
+    utility.printLogWithName("검색 요청 처리 완료 (독서 기록)", "Search API")
 }
