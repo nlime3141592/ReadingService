@@ -1,3 +1,5 @@
+import sys
+import time
 import socket
 import wordembedding as embed
 from recommender import recommend_one_keyword
@@ -11,7 +13,11 @@ def start_server():
     serverSocket.listen()
 
     model = embed.WordEmbedding()
+    print("Load AI Model. please Wait.", end="", flush=True)
     model.load_model("C:/Programming/PythonAI/GoogleNews-vectors-negative300.bin")
+    sys.stdout.flush()
+    time.sleep(1)
+    print("<INITIALIZED>", end="", flush=True)
 
     while True:
         clientSocket, addr = serverSocket.accept()
