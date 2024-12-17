@@ -3,22 +3,21 @@ const getDatabaseId = require("./getDatabaseId");
 const getTupleByISBN = require("./getTupleByISBN");
 
 const headers = {
-  Authorization: "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",
+  Authorization: "사용자 Token 들어가야함",
   "Notion-Version": "2022-06-28",
 };
 
-const pageId = "1479ede653a980c5aa9fe6f2109c4612";
-const isbn = "testISBN";
-
-async function getEveryBookRank(pageId) {
-  const databaseId = await getDatabaseId.getDatabaseId(pageId);
+async function getEveryBookRank(token, pageId) {
+  headers["Authorization"] = token;
+  const databaseId = await getDatabaseId.getDatabaseId(token, pageId);
   const everyTupleData = await getEveryTuple(databaseId);
   const bookRanks = extractRankFromTuples(everyTupleData);
   return bookRanks;
 }
 
-async function getBookRankByISBN(pageId, isbn) {
-  const databaseId = await getDatabaseId.getDatabaseId(pageId);
+async function getBookRankByISBN(token, pageId, isbn) {
+  headers["Authorization"] = token;
+  const databaseId = await getDatabaseId.getDatabaseId(token, pageId);
   const tupleData = await getTupleByISBN.foundISBN(databaseId, isbn);
   const bookRank = extractRankFromTuple(tupleData) ?? false;
   return bookRank;
@@ -73,3 +72,5 @@ async function getEveryTuple(databaseId) {
   }
   return totalResult;
 }
+
+module.exports = { getEveryBookRank, getBookRankByISBN };

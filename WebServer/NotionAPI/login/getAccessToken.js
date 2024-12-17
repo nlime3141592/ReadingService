@@ -1,7 +1,5 @@
 const axios = require("axios");
 
-const code = "03fa7d89-75bb-4125-bf9f-6d4ac9f66b13";
-
 async function getAccessToken(code) {
   try {
     const response = await axios.post(
@@ -10,13 +8,13 @@ async function getAccessToken(code) {
         grant_type: "authorization_code",
         code: code,
         // api 설정을 바꾸어야함 - 실제 서버에서 사용 중인 라우터로
-        redirect_uri: "https://localhost:8080/test",
+        redirect_uri: "https://localhost:8443/jwe/create",
       },
       {
         // 환경 변수로 변경하여 보안 높일 필요
         auth: {
-          username: "15ed872b-594c-80f0-ab76-0037de8dd2b4",
-          password: "secret_mjQ3d6HhkpfjEzZf8mKpdLzU3Jt5SdqxxXIL0zoJX40",
+          username: process.env.OAuthClientID,
+          password: process.env.OAuthClientSecret,
         },
         headers: {
           "Content-Type": "application/json",
@@ -59,3 +57,5 @@ async function getAccessablePageId(accessToken) {
     );
   }
 }
+
+module.exports = { getAccessToken, getAccessablePageId };

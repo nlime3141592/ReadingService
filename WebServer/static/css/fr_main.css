@@ -1,3 +1,7 @@
+.hide {
+  display: none !important;
+}
+
 body {
   background-color: #2f2b28;
   margin: 0;
@@ -205,8 +209,4 @@ body {
   color: #e8e7e2;
   text-align: center;
   margin-top: 4vh;
-}
-
-.hide {
-  display: none;
 }
