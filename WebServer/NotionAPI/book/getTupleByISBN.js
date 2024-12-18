@@ -7,7 +7,7 @@ const headers = {
   "Notion-Version": "2022-06-28",
 };
 
-async function getTuple(token, pageId, isbn) {
+async function getTuple(token, pageId, isbn, bookName = "") {
   headers["Authorization"] = token;
   let tupleId = null;
   const databaseId = await getDatabaseId.getDatabaseId(token, pageId);
@@ -15,7 +15,7 @@ async function getTuple(token, pageId, isbn) {
   if (foundResult["results"][0]) {
     tupleId = foundResult["results"][0]["id"];
   } else {
-    const createdTuple = await createTuple(databaseId, isbn);
+    const createdTuple = await createTuple(databaseId, isbn, bookName);
     tupleId = createdTuple["id"];
   }
 
@@ -46,9 +46,7 @@ function foundISBN(token, databaseId, isbn) {
     });
 }
 
-async function createTuple(database_id, isbn) {
-  const tempBookTitle = "책 이름 가져오는 방법 필요";
-
+async function createTuple(database_id, isbn, bookName) {
   const today = new Date();
   const year = today.getFullYear();
   const month = (today.getMonth() + 1).toString().padStart(2, "0");
@@ -62,7 +60,7 @@ async function createTuple(database_id, isbn) {
         title: [{ text: { content: isbn } }],
       },
       "책 제목": {
-        rich_text: [{ text: { content: tempBookTitle } }],
+        rich_text: [{ text: { content: bookName } }],
       },
       "읽은 날짜": {
         date: { start: formattedDate },

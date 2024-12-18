@@ -26,9 +26,11 @@ async function __post_readnote_upload(req, res) {
     if (!pageId) res.status(400).send("Page ID not found");
 
     const responseUpload = await addBookReport.addBookReport(
+      token,
       pageId,
       requestBody["isbn"],
-      requestBody["report"]
+      requestBody["report"],
+      requestBody["bookName"]
     );
 
     return res
