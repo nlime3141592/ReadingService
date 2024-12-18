@@ -98,8 +98,19 @@ async function main() {
 
     await db_connection.final();
 
-    server.close(() => {
-      utility.printLogWithName("서버가 정상적으로 종료되었습니다.", "System");
+    httpServer.close(() => {
+      utility.printLogWithName(
+        "http 서버가 정상적으로 종료되었습니다.",
+        "System"
+      );
+      process.exit(0);
+    });
+
+    httpsServer.close(() => {
+      utility.printLogWithName(
+        "https 서버가 정상적으로 종료되었습니다.",
+        "System"
+      );
       process.exit(0);
     });
 

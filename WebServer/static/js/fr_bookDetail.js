@@ -2,7 +2,7 @@ console.log("load bookDetail.js");
 
 let storedJWE = sessionStorage.getItem("jweToken");
 let logined = false;
-let isbn = "";
+let bookInfo = null;
 
 const userRankButton = document.getElementById("user-rank-button");
 
@@ -32,7 +32,8 @@ recordButton.onclick = () => {
 window.onload = async function () {
   await isLogined();
   const urlParams = new URLSearchParams(window.location.search);
-  isbn = urlParams.get("isbn");
+  const isbn = urlParams.get("isbn");
+  bookInfo = await (await fetch(`/search/by-isbn13/${isbn}`)).json();
   setBook();
 };
 
@@ -76,8 +77,10 @@ function setRankButtonEnabled(enable) {
     userRankButton.onclick = () => {
       setUserRank();
     };
+    userRankButton.classList.remove("disabled");
   } else {
     userRankButton.onclick = null;
+    userRankButton.classList.add("disabled");
   }
 }
 
@@ -89,7 +92,7 @@ async function getUserRank() {
     },
     body: JSON.stringify({
       jwe: storedJWE,
-      isbn: isbn,
+      isbn: bookInfo["isbn13"],
     }),
   });
   return rankResult.text();
@@ -110,8 +113,9 @@ async function setUserRank() {
     },
     body: JSON.stringify({
       jwe: storedJWE,
-      isbn: isbn,
+      isbn: bookInfo["isbn13"],
       rank: rank == 1 ? "❤" : "💙",
+      bookName: bookInfo["title"],
     }),
   });
   if (rankUpdateResult.ok) {
@@ -127,7 +131,6 @@ async function setUserRank() {
  * 책 설명을 설정
  */
 async function setBook() {
-  const bookInfo = await (await fetch(`/search/by-isbn13/${isbn}`)).json();
   setBookTitleSlot(bookInfo);
   setBookDetail(bookInfo);
   setBottomGrid(bookInfo);
@@ -205,5 +208,5 @@ async function setBottomGrid(bookInfo) {
   const reportButton = document.querySelector("#reading-note");
   // 세션에 따라 표시 여부 설정 필요
   // 연결될 url 삽입
-  reportButton.href = `/readnote/?isbn=${isbn}`;
+  reportButton.href = `/readnote/?isbn=${bookInfo["isbn13"]}`;
 }
