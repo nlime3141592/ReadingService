@@ -1,6 +1,7 @@
 console.log("load bookReport.js");
 
 let storedJWE = sessionStorage.getItem("jweToken");
+let bookInfo = null;
 
 // 감상문 등록 버튼
 const submitButton = document.getElementById("btn-done");
@@ -32,7 +33,8 @@ window.onload = async function () {
   await isLogined();
   const urlParams = new URLSearchParams(window.location.search);
   const isbn = urlParams.get("isbn");
-  setBook(isbn);
+  bookInfo = await (await fetch(`/search/by-isbn13/${isbn}`)).json();
+  setBook();
 };
 
 async function isLogined() {
@@ -68,8 +70,7 @@ function goBookList(mode) {
   window.location = "/";
 }
 
-async function setBook(isbn) {
-  const bookInfo = await (await fetch(`/search/by-isbn13/${isbn}`)).json();
+async function setBook() {
   document.querySelector("#book-info-image").src = bookInfo["cover"];
   document.querySelector("#book-info-text").textContent = bookInfo["title"];
 }
@@ -83,11 +84,12 @@ async function submit() {
     headers: {
       "Content-Type": "application/json",
     },
-    body: {
+    body: JSON.stringify({
       jwe: storedJWE,
-      isbn: urlParams.get("isbn"),
-      report: JSON.stringify(richText),
-    },
+      isbn: bookInfo["isbn13"],
+      report: richText,
+      bookName: bookInfo["title"],
+    }),
   });
   if (responseUploadReport.ok) {
     window.alert("등록되었습니다.");
@@ -106,7 +108,6 @@ async function submit() {
 function htmlToNotion(element) {
   let children = element.children;
   let result = {
-    block_id: "",
     children: [],
   };
 

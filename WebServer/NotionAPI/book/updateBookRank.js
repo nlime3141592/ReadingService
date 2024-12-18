@@ -7,9 +7,10 @@ const headers = {
   "Notion-Version": "2022-06-28",
 };
 
-async function updateBookRank(token, pageId, isbn, rank) {
+async function updateBookRank(token, pageId, isbn, rank, bookName = "") {
   headers["Authorization"] = token;
-  const tupleId = await getTupleByISBN.getTuple(token, pageId, isbn, rank);
+  const tupleId = await getTupleByISBN.getTuple(token, pageId, isbn, bookName);
+  console.log(tupleId);
   const updateResult = await updateTuple(tupleId, rank);
   return updateResult;
 }

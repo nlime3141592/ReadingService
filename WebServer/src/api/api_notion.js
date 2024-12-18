@@ -38,6 +38,8 @@ async function __post_notion_rank_update_isbn(req, res) {
     const isbn = requestBody["isbn"];
     const jwe = requestBody["jwe"];
     const rank = requestBody["rank"];
+    const bookName = requestBody["bookName"];
+    console.log(bookName);
     if (!isbn || !jwe || !rank) {
       return res
         .status(400)
@@ -50,7 +52,8 @@ async function __post_notion_rank_update_isbn(req, res) {
       token,
       pageId,
       isbn,
-      rank
+      rank,
+      bookName
     );
     return res.sendStatus(200);
   } catch (error) {

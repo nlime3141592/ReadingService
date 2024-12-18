@@ -264,13 +264,18 @@ body {
   transition: scale 0.2s;
 }
 
-.rank-item:hover {
+.rank-item:hover:not(.disabled) {
   scale: 1.05;
   cursor: pointer;
 }
 
-.rank-item:active img {
+.rank-item:active:not(.disabled) img {
   transform: scale(0.9);
+}
+
+.rank-item.disabled {
+  cursor: not-allowed;
+  scale: 0.9;
 }
 
 .rank-item img {

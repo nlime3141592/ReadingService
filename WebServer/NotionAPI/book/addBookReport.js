@@ -13,9 +13,9 @@ const headers = {
  * @param {JSON} reportJson 등록될 감상문 - report 페이지에서 생성되는거 그대로 주면됨
  * @returns response 받음 - 200이면 ok
  */
-async function addBookReport(token, pageId, isbn, reportJson) {
+async function addBookReport(token, pageId, isbn, reportJson, bookName = "") {
   headers["Authorization"] = token;
-  const tupleId = await getTupleByISBN.getTuple(token, pageId, isbn);
+  const tupleId = await getTupleByISBN.getTuple(token, pageId, isbn, bookName);
   const addReportResult = await addReport(tupleId, reportJson);
   return addReportResult;
 }
