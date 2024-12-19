@@ -47,8 +47,8 @@ def translate_keywords(data):
     keywords = translator.translateAllReservedWords()
 
     positives = keywords[0:countPositive]
-    negatives = keywords[countPositive:countPositive + countNegative]
-    randoms = keywords[countPositive + countNegative:countPositive + countNegative + countRandom]
+    negatives = keywords[countPositive:(countPositive + countNegative)]
+    randoms = keywords[(countPositive + countNegative):(countPositive + countNegative + countRandom)]
 
     return [positives, negatives, randoms]
 
@@ -76,16 +76,25 @@ def select_one_keyword(model, keywords):
     negativeKeywords = keywords[1]
     randomKeywords = keywords[2]
 
-    # print("pos == ", end="")
-    # print(positiveKeywords)
-    # print("neg == ", end="")
-    # print(negativeKeywords)
-    # print("rng == ", end="")
-    # print(randomKeywords)
+    print("pos == ", end="")
+    print(positiveKeywords)
+    print("neg == ", end="")
+    print(negativeKeywords)
+    print("rng == ", end="")
+    print(randomKeywords)
 
-    positiveVectors = [ model.get_word_vector(positiveKeywords[i].split("+")[1]) for i in range(len(positiveKeywords))]
-    negativeVectors = [ model.get_word_vector(negativeKeywords[i].split("+")[1]) for i in range(len(negativeKeywords))]
-    randomVectors = [ model.get_word_vector(randomKeywords[i].split("+")[1]) for i in range(len(randomKeywords))]
+    positiveVectors = [
+        model.get_word_vector(positiveKeywords[i].split("+")[1].lower().strip() if len(positiveKeywords[i].split("+")) > 1 else "")
+        for i in range(len(positiveKeywords))
+        ]
+    negativeVectors = [
+        model.get_word_vector(negativeKeywords[i].split("+")[1].lower().strip() if len(negativeKeywords[i].split("+")) > 1 else "")
+        for i in range(len(negativeKeywords))
+        ]
+    randomVectors = [
+        model.get_word_vector(randomKeywords[i].split("+")[1].lower().strip() if len(randomKeywords[i].split("+")) > 1 else "")
+        for i in range(len(randomKeywords))
+        ]
 
     batchSize = 4
     selectedKeywordIndex = 0

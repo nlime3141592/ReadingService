@@ -2,6 +2,8 @@ module.exports = {
   query_page_from_all_books: __query_page_from_all_books,
   query_book_info_by_isbn13: __query_book_info_by_isbn13,
   query_page_from_keyword: __query_page_from_keyword,
+  query_random_keywords: __query_random_keywords,
+  query_important_keywords_by_isbn13: __query_important_keywords_by_isbn13
 };
 
 const utility = require("../utility.js");
@@ -71,4 +73,34 @@ async function __query_page_from_keyword(keyword, pageNum, booksPerPage) {
     .toArray();
 
   return batch;
+}
+
+async function __query_random_keywords(count) {
+  const dbBook = db_connection.get_db("book");
+  const sourceCollection = dbBook.collection("bookkeywords");
+
+  const pipeline = [
+    { $sample: { size: count } }
+  ]
+
+  const results = await sourceCollection.aggregate(pipeline).toArray()
+
+  return results
+}
+
+async function __query_important_keywords_by_isbn13(isbn13, weight_min) {
+  const dbBook = db_connection.get_db("book");
+  const sourceCollection = dbBook.collection("bookkeywords");
+  const query = { isbn13: `${isbn13}`, weight: { $gte: weight_min } }
+  const results = await sourceCollection
+    .find(query)
+    .toArray()
+
+  let selectedKeywords = ""
+
+  for (json of results) {
+    selectedKeywords += json["word"] + "/"
+  }
+
+  return selectedKeywords
 }
