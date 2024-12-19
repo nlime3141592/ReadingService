@@ -100,18 +100,35 @@ async function getPage(_mode) {
     `검색: ${searchKeyword}`,
   ];
   setStatus(statusString[mode]);
-  if (mode == 2) {
-    isbnList = await (
-      await fetch(`/search/by-history`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          jwe: storedJWE,
-        }),
-      })
-    ).json();
+  switch (mode) {
+    case 1:
+      isbnList[mode] = await (
+        await fetch(`/search/by-recommendation`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            jwe: storedJWE,
+          })
+        })
+      ).json();
+      break;
+    case 2:
+      isbnList[mode] = await (
+        await fetch(`/search/by-history`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            jwe: storedJWE,
+          }),
+        })
+      ).json();
+      break;
+    default:
+      break;
   }
   getNextPage(+1);
 }
@@ -231,9 +248,9 @@ function setBook(bookSlot, book) {
   const author =
     typeof book["author"] === "string"
       ? book["author"]
-          .split(",")[0]
-          .replace(/\([^)]*\)/g, "")
-          .trim()
+        .split(",")[0]
+        .replace(/\([^)]*\)/g, "")
+        .trim()
       : "Unknown Author";
 
   bookAuthor.textContent = author;
