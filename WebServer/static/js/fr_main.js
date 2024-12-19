@@ -1,11 +1,12 @@
 console.log("load main.js");
 
+let logined = false;
 let storedJWE = sessionStorage.getItem("jweToken");
 const BOOKS_PER_PAGE = 12;
 
 let pageNum = 1;
 // isbn 리스트 | {0: 없음, 1: 추천, 2: 독서 기록}
-let isbnList = [0, 0, 0];
+let isbnList = [null, null, null];
 let searchKeyword = "";
 let mode = 0; // 0: 메인, 1: 추천, 2: 독서 기록, 3: 검색 기록
 
@@ -70,7 +71,6 @@ window.onload = async function () {
 };
 
 async function isLogined() {
-  let logined = false;
   if (storedJWE != null) {
     const verifyResult = await fetch(`/jwe/verify`, {
       method: "POST",
@@ -82,7 +82,11 @@ async function isLogined() {
     if (verifyResult.ok) logined = true;
     else console.error("JWE 검증 실패:", await verifyResult.text());
   }
-  if (logined) {
+  setElement(logined);
+}
+
+function setElement(isLogined) {
+  if (isLogined) {
     document.querySelector("#btn-recommend").classList.remove("hide");
     document.querySelector("#btn-record").classList.remove("hide");
     document.querySelector("#login-button").classList.add("hide");
@@ -99,39 +103,53 @@ function setStatus(string) {
 
 // 홈 버튼 함수
 async function getHome() {
+  setBookShelf([]);
   mode = 0;
   pageNum = 0;
-  getNextPage(+1);
   setStatus("도서 목록");
+  getNextPage(+1);
 }
 
 // 추천 도서 버튼 함수
 async function getRecommend() {
+  setBookShelf([]);
   mode = 1;
   pageNum = 0;
+  setStatus("추천 도서");
   // 서버에서 추천 받기
   isbnList[mode] = await (await fetch(`/search/by-recommendation`)).json();
   getNextPage(+1);
-  setStatus("추천 도서");
 }
 
 // 독서 기록 버튼 함수
 async function getRecord() {
+  setBookShelf([]);
   mode = 2;
   pageNum = 0;
-  // notion 에서 리스트 가져오기
-  isbnList[mode] = await (await fetch(`/search/by-history`)).json();
-  getNextPage(+1);
   setStatus("독서 기록");
+  // notion 에서 리스트 가져오기
+  isbnList[mode] = await (
+    await fetch(`/search/by-history`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        jwe: storedJWE,
+      }),
+    })
+  ).json();
+  getNextPage(+1);
 }
 
 // 검색 버튼 함수
 async function getSearch() {
+  setBookShelf([]);
   mode = 3;
   pageNum = 0;
   searchKeyword = document.getElementsByClassName("search-text")[0].value;
-  getNextPage(+1);
   setStatus(`검색: ${searchKeyword}`);
+  getNextPage(+1);
 }
 
 function setStatus(string) {
@@ -173,13 +191,19 @@ async function getBookList(pageNum) {
       break;
     case 1: // 추천
     case 2: // 독서 기록
-      if (isbnList[mode].length >= pageNum * 10) {
-        for (let idx = (pageNum - 1) * 12 + 1; idx <= pageNum * 12; i++) {
-          const isbn = isbnList[mode][idx];
-          // DB에서 특정 ISBN에 대한 bookInfo의 요청
-          const response_record = await fetch(`/search/by-isbn13/${isbn}`);
-          // 결과를 bookList에 저장
-          bookList.push(await response_record.json());
+      if (Object.keys(isbnList[mode]).length >= (pageNum - 1) * 10) {
+        for (
+          let idx = (pageNum - 1) * BOOKS_PER_PAGE + 1;
+          idx <= pageNum * BOOKS_PER_PAGE;
+          idx++
+        ) {
+          const isbn = Object.keys(isbnList[mode])[idx - 1];
+          if (isbn) {
+            // DB에서 특정 ISBN에 대한 bookInfo의 요청
+            const response_record = await fetch(`/search/by-isbn13/${isbn}`);
+            // 결과를 bookList에 저장
+            bookList.push(await response_record.json());
+          }
         }
       }
       break;
