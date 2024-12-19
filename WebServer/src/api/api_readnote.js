@@ -18,12 +18,21 @@ function __readnote(req, res) {
 async function __post_readnote_upload(req, res) {
   try {
     const requestBody = req.body;
+    const { jwe } = requestBody;
 
-    const token = await verifyJWE.verifyJWE(requestBody["jwe"]);
-    if (!token) return res.status(400).send("Invalid JWE");
+    let token;
+    try {
+      token = await verifyJWE.verifyJWE(jwe);
+      if (!token) {
+        return res.status(400).send({ error: "Invalid JWE" });
+      }
+    } catch (error) {
+      console.error("Error verify JWE:", error);
+      return res.status(400).send();
+    }
 
     const pageId = await verifyJWE.getAccessablePageId(token);
-    if (!pageId) res.status(400).send("Page ID not found");
+    if (!pageId) res.status(404).send("Page ID not found");
 
     const responseUpload = await addBookReport.addBookReport(
       token,

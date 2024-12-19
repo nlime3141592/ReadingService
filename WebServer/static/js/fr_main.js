@@ -1,6 +1,5 @@
 console.log("load main.js");
 
-let logined = false;
 let storedJWE = sessionStorage.getItem("jweToken");
 let pageNum = 1;
 let searchKeyword = "";
@@ -18,19 +17,6 @@ const searchButton = document.getElementById("search-button");
 const leftButton = document.getElementById("left-button");
 const rightButton = document.getElementById("right-button");
 const loginButton = document.getElementById("login-button");
-
-homeButton.onclick = () => {
-  getPage(0);
-};
-recommendButton.onclick = () => {
-  getPage(1);
-};
-recordButton.onclick = () => {
-  getPage(2);
-};
-searchButton.onclick = () => {
-  getPage(3);
-};
 
 window.onload = async function () {
   const urlParams = new URLSearchParams(window.location.search);
@@ -50,7 +36,20 @@ window.onload = async function () {
   } else {
     getPage(0);
   }
-  await isLogined();
+  setElement(storedJWE != null);
+};
+
+homeButton.onclick = () => {
+  getPage(0);
+};
+recommendButton.onclick = () => {
+  getPage(1);
+};
+recordButton.onclick = () => {
+  getPage(2);
+};
+searchButton.onclick = () => {
+  getPage(3);
 };
 
 leftButton.onclick = () => {
@@ -64,21 +63,6 @@ loginButton.onclick = () => {
   const loginPage = `https://api.notion.com/v1/oauth/authorize?client_id=15ed872b-594c-80f0-ab76-0037de8dd2b4&response_type=code&owner=user&redirect_uri=https%3A%2F%2Flocalhost%3A8443%2Fjwe%2Fcreate`;
   window.location.href = loginPage;
 };
-
-async function isLogined() {
-  if (storedJWE != null) {
-    const verifyResult = await fetch(`/jwe/verify`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        jwe: storedJWE,
-      }),
-    });
-    if (verifyResult.ok) logined = true;
-    else console.error("JWE 검증 실패:", await verifyResult.text());
-  }
-  setElement(logined);
-}
 
 function setElement(isLogined) {
   if (isLogined) {
@@ -101,17 +85,22 @@ async function getPage(_mode) {
   ];
   setStatus(statusString[mode]);
   if (mode == 2) {
-    isbnList = await (
-      await fetch(`/search/by-history`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          jwe: storedJWE,
-        }),
-      })
-    ).json();
+    const searchByHistoryResult = await fetch(`/search/by-history`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        jwe: storedJWE,
+      }),
+    });
+    console.log(searchByHistoryResult.status);
+    if (searchByHistoryResult.status == 400) {
+      sessionStorage.removeItem("jweToken");
+      window.alert("로그인이 해제되었습니다. 다시 로그인해주세요.");
+      location.reload();
+    }
+    isbnList = await searchByHistoryResult.json();
   }
   getNextPage(+1);
 }
@@ -158,18 +147,21 @@ async function getBookList(pageNum) {
       bookList = await response_main.json();
       break;
     case 1: // 추천
-      const recommendResult = await (
-        await fetch(`/search/by-recommendation`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            jwe: storedJWE,
-          }),
-        })
-      ).json();
-      bookList = recommendResult["bookList"];
+      const recommendResult = await fetch(`/search/by-recommendation`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          jwe: storedJWE,
+        }),
+      });
+      if (recommendResult.status == 400) {
+        sessionStorage.removeItem("jweToken");
+        window.alert("로그인이 해제되었습니다. 다시 로그인해주세요.");
+        location.reload();
+      }
+      bookList = (await recommendResult.json())["bookList"];
       setStatus(`추천 도서 - 키워드: ${recommendResult["selectedKeyword"]}`);
       break;
     case 2: // 독서 기록

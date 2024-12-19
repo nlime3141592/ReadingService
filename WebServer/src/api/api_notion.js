@@ -14,14 +14,26 @@ function __init(app) {
 async function __post_notion_rank_get_isbn(req, res) {
   try {
     const requestBody = req.body;
-    const isbn = requestBody["isbn"];
-    const jwe = requestBody["jwe"];
+    const { isbn, jwe } = requestBody;
 
     if (!isbn || !jwe) {
-      return res.status(400).send({ error: "ISBN and JWE are required." });
+      return res.status(422).send({
+        error: "Missing required fields.",
+        details: { isbn: !isbn, jwe: !jwe },
+      });
     }
 
-    const token = await verifyJWE.verifyJWE(jwe);
+    let token;
+    try {
+      token = await verifyJWE.verifyJWE(jwe);
+      if (!token) {
+        return res.status(400).send({ error: "Invalid JWE" });
+      }
+    } catch (error) {
+      console.error("Error verify JWE:", error);
+      return res.status(400).send();
+    }
+
     const pageId = await verifyJWE.getAccessablePageId(token);
     const rank = await getBookRank.getBookRankByISBN(token, pageId, isbn);
 
@@ -35,18 +47,25 @@ async function __post_notion_rank_get_isbn(req, res) {
 async function __post_notion_rank_update_isbn(req, res) {
   try {
     const requestBody = req.body;
-    const isbn = requestBody["isbn"];
-    const jwe = requestBody["jwe"];
-    const rank = requestBody["rank"];
-    const bookName = requestBody["bookName"];
+    const { isbn, jwe, rank, bookName } = requestBody;
     console.log(bookName);
     if (!isbn || !jwe || !rank) {
-      return res
-        .status(400)
-        .send({ error: "ISBN and JWE and RANK are required." });
+      return res.status(422).send({
+        error: "Missing required fields.",
+        details: { isbn: !isbn, jwe: !jwe, rank: !rank },
+      });
     }
 
-    const token = await verifyJWE.verifyJWE(jwe);
+    let token;
+    try {
+      token = await verifyJWE.verifyJWE(jwe);
+      if (!token) {
+        return res.status(400).send({ error: "Invalid JWE" });
+      }
+    } catch (error) {
+      console.error("Error verify JWE:", error);
+      return res.status(400).send();
+    }
     const pageId = await verifyJWE.getAccessablePageId(token);
     const updateResult = await updateBookRank.updateBookRank(
       token,

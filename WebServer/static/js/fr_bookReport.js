@@ -1,7 +1,6 @@
 console.log("load bookReport.js");
 
 let bookInfo = null;
-let logined = false;
 let storedJWE = sessionStorage.getItem("jweToken");
 
 // 감상문 등록 버튼
@@ -13,28 +12,10 @@ window.onload = async function () {
   const isbn = urlParams.get("isbn");
   bookInfo = await (await fetch(`/search/by-isbn13/${isbn}`)).json();
   setBook();
-  await isLogined();
+  setElement(storedJWE != null);
 };
 
 submitButton.onclick = submit;
-
-/**
- * 현재 저장된 JWE 토큰의 유효성 판단을 통해 로그인되었는지 확인함
- */
-async function isLogined() {
-  if (storedJWE != null) {
-    const verifyResult = await fetch(`/jwe/verify`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        jwe: storedJWE,
-      }),
-    });
-    if (verifyResult.ok) logined = true;
-    else console.error("JWE 검증 실패:", await verifyResult.text());
-  }
-  setElement(logined);
-}
 
 function setElement(isLogined) {
   if (isLogined) {
@@ -74,6 +55,11 @@ async function submit() {
     // 등록 완료 후 메인 화면으로 이동
     goBookList(0);
   } else {
+    if (responseUploadReport.status == 400) {
+      sessionStorage.removeItem("jweToken");
+      window.alert("로그인이 해제되었습니다. 다시 로그인해주세요.");
+      location.reload();
+    }
     window.alert("오류가 발생하였습니다. 다시 시도해주세요.");
   }
 }

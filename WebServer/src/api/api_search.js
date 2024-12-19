@@ -70,12 +70,21 @@ async function __post_search_by_recommendation(req, res) {
   // 랜덤 키워드 리스트는 DB에서 아무 키워드나 쿼리하면 됩니다.
   try {
     const requestBody = req.body;
+    const { jwe } = requestBody;
 
-    const token = await verifyJWE.verifyJWE(requestBody["jwe"]);
-    if (!token) return res.status(400).send("Invalid JWE");
+    let token;
+    try {
+      token = await verifyJWE.verifyJWE(jwe);
+      if (!token) {
+        return res.status(400).send({ error: "Invalid JWE" });
+      }
+    } catch (error) {
+      console.error("Error verify JWE:", error);
+      return res.status(400).send();
+    }
 
     const pageId = await verifyJWE.getAccessablePageId(token);
-    if (!pageId) res.status(400).send("Page ID not found");
+    if (!pageId) res.status(404).send("Page ID not found");
 
     const responseEveryRank = await getBookRank.getEveryBookRank(token, pageId);
 
@@ -158,10 +167,18 @@ async function __post_search_by_recommendation(req, res) {
 async function __post_search_by_history(req, res) {
   try {
     const requestBody = req.body;
+    const { jwe } = requestBody;
 
-    const token = await verifyJWE.verifyJWE(requestBody["jwe"]);
-    if (!token) return res.status(400).send("Invalid JWE");
-
+    let token;
+    try {
+      token = await verifyJWE.verifyJWE(jwe);
+      if (!token) {
+        return res.status(400).send({ error: "Invalid JWE" });
+      }
+    } catch (error) {
+      console.error("Error verify JWE:", error);
+      return res.status(400).send();
+    }
     const pageId = await verifyJWE.getAccessablePageId(token);
     if (!pageId) res.status(400).send("Page ID not found");
 

@@ -1,6 +1,5 @@
 console.log("load bookDetail.js");
 
-let logined = false;
 let bookInfo = null;
 let rank = 0;
 let storedJWE = sessionStorage.getItem("jweToken");
@@ -12,23 +11,8 @@ window.onload = async function () {
   const isbn = urlParams.get("isbn");
   bookInfo = await (await fetch(`/search/by-isbn13/${isbn}`)).json();
   setBook();
-  await isLogined();
+  setElement(storedJWE != null);
 };
-
-async function isLogined() {
-  if (storedJWE != null) {
-    const verifyResult = await fetch(`/jwe/verify`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        jwe: storedJWE,
-      }),
-    });
-    if (verifyResult.ok) logined = true;
-    else console.error("JWE 검증 실패:", await verifyResult.text());
-  }
-  setElement(logined);
-}
 
 function setElement(isLogined) {
   if (isLogined) {
@@ -65,6 +49,11 @@ async function getUserRank() {
       isbn: bookInfo["isbn13"],
     }),
   });
+  if (rankResult.status == 400) {
+    sessionStorage.removeItem("jweToken");
+    window.alert("로그인이 해제되었습니다. 다시 로그인해주세요.");
+    location.reload();
+  }
   return rankResult.text();
 }
 
@@ -92,6 +81,11 @@ async function setUserRank() {
     document.querySelector("#user-rank img").src =
       rank == 1 ? "./img/pineappleIcon.png" : "./img/pineconeIcon.png";
   } else {
+    if (rankResult.status == 400) {
+      sessionStorage.removeItem("jweToken");
+      window.alert("로그인이 해제되었습니다. 다시 로그인해주세요.");
+      location.reload();
+    }
     rank = prevRank;
   }
   setRankButtonEnabled(true);
@@ -157,7 +151,7 @@ async function setBottomGrid(bookInfo) {
   // set user rank
   const userRank = document.querySelector("#user-rank");
   let rankMark = "🤍";
-  if (logined) {
+  if (storedJWE != null) {
     rankMark = await getUserRank();
   }
   if (rankMark == "❤") {
