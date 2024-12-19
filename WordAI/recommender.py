@@ -104,7 +104,7 @@ def select_one_keyword(model, keywords):
         positiveDot = calc_similarity(positiveVectors, randomVectors[i], batchSize)
         negativeDot = calc_similarity(negativeVectors, randomVectors[i], batchSize)
 
-        if negativeDot > 0.2 or positiveDot < negativeDot or positiveDot < maxDotSum:
+        if negativeDot > 0.2 or positiveDot < maxDotSum:
             continue
         else:
             selectedKeywordIndex = i
