@@ -94,7 +94,6 @@ async function getPage(_mode) {
         jwe: storedJWE,
       }),
     });
-    console.log(searchByHistoryResult.status);
     if (searchByHistoryResult.status == 400) {
       sessionStorage.removeItem("jweToken");
       window.alert("로그인이 해제되었습니다. 다시 로그인해주세요.");

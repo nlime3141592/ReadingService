@@ -136,6 +136,9 @@ function setBookDetail(bookInfo) {
  * @param {JSON} bookInfo JSON 형식의 book info
  */
 async function setBottomGrid(bookInfo) {
+  // set report button
+  const reportButton = document.querySelector("#reading-note");
+  reportButton.href = `/readnote/?isbn=${bookInfo["isbn13"]}`;
   // set book link button
   document.querySelector("#book-link").href = bookInfo["link"];
   // set customer review rank
@@ -166,8 +169,4 @@ async function setBottomGrid(bookInfo) {
   }
 
   setRankButtonEnabled(true);
-
-  // set report button
-  const reportButton = document.querySelector("#reading-note");
-  reportButton.href = `/readnote/?isbn=${bookInfo["isbn13"]}`;
 }
