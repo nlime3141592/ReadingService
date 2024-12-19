@@ -93,42 +93,25 @@ async function getPage(_mode) {
   searchKeyword = document.getElementsByClassName("search-text")[0].value;
   mode = _mode;
   pageNum = 0;
-  statusString = [
+  let statusString = [
     "도서 목록",
-    "추천 도서",
+    `추천 도서 - 키워드:`,
     "독서 기록",
     `검색: ${searchKeyword}`,
   ];
   setStatus(statusString[mode]);
-  switch (mode) {
-    case 1:
-      isbnList[mode] = await (
-        await fetch(`/search/by-recommendation`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            jwe: storedJWE,
-          })
-        })
-      ).json();
-      break;
-    case 2:
-      isbnList[mode] = await (
-        await fetch(`/search/by-history`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            jwe: storedJWE,
-          }),
-        })
-      ).json();
-      break;
-    default:
-      break;
+  if (mode == 2) {
+    isbnList = await (
+      await fetch(`/search/by-history`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          jwe: storedJWE,
+        }),
+      })
+    ).json();
   }
   getNextPage(+1);
 }
@@ -175,7 +158,19 @@ async function getBookList(pageNum) {
       bookList = await response_main.json();
       break;
     case 1: // 추천
-      bookList = await (await fetch(`/search/by-recommendation`)).json();
+      const recommendResult = await (
+        await fetch(`/search/by-recommendation`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            jwe: storedJWE,
+          }),
+        })
+      ).json();
+      bookList = recommendResult["bookList"];
+      setStatus(`추천 도서 - 키워드: ${recommendResult["selectedKeyword"]}`);
       break;
     case 2: // 독서 기록
       if (Object.keys(isbnList).length >= (pageNum - 1) * 10) {
@@ -248,9 +243,9 @@ function setBook(bookSlot, book) {
   const author =
     typeof book["author"] === "string"
       ? book["author"]
-        .split(",")[0]
-        .replace(/\([^)]*\)/g, "")
-        .trim()
+          .split(",")[0]
+          .replace(/\([^)]*\)/g, "")
+          .trim()
       : "Unknown Author";
 
   bookAuthor.textContent = author;

@@ -80,55 +80,61 @@ async function __post_search_by_recommendation(req, res) {
     const responseEveryRank = await getBookRank.getEveryBookRank(token, pageId);
 
     const data = {
-      "positiveKeywords": "",
-      "negativeKeywords": "",
-      "randomKeywords": ""
-    }
+      positiveKeywords: "",
+      negativeKeywords: "",
+      randomKeywords: "",
+    };
 
     // good: ❤
     // bad: 💙
 
-    const weight_min = 3
+    const weight_min = 3;
 
     for (let isbn13 in responseEveryRank) {
-      if (responseEveryRank[`${isbn13}`] == "❤") // NOTE: GOOD
-      {
-        data["positiveKeywords"] += await dbQuery.query_important_keywords_by_isbn13(isbn13, weight_min)
-      }
-      else if (responseEveryRank[`${isbn13}`] == "💙") // NOTE: BAD
-      {
-        data["negativeKeywords"] += await dbQuery.query_important_keywords_by_isbn13(isbn13, weight_min)
+      if (responseEveryRank[`${isbn13}`] == "❤") {
+        // NOTE: GOOD
+        data["positiveKeywords"] +=
+          await dbQuery.query_important_keywords_by_isbn13(isbn13, weight_min);
+      } else if (responseEveryRank[`${isbn13}`] == "💙") {
+        // NOTE: BAD
+        data["negativeKeywords"] +=
+          await dbQuery.query_important_keywords_by_isbn13(isbn13, weight_min);
       }
     }
 
-    const randomKeywordCount = 100
-    let jsonRandoms = await dbQuery.query_random_keywords(randomKeywordCount)
+    const randomKeywordCount = 100;
+    let jsonRandoms = await dbQuery.query_random_keywords(randomKeywordCount);
 
     for (let json of jsonRandoms) {
-      data["randomKeywords"] += json["word"] + "/"
+      data["randomKeywords"] += json["word"] + "/";
     }
 
     if (data["positiveKeywords"].split("/").length < 4) {
-      data["positiveKeywords"] = data["randomKeywords"]
+      data["positiveKeywords"] = data["randomKeywords"];
     }
     if (data["negativeKeywords"].split("/").length < 4) {
-      data["negativeKeywords"] = data["randomKeywords"]
+      data["negativeKeywords"] = data["randomKeywords"];
     }
 
     // TODO: 최종 배포할 때 host 주소를 올바르게 설정해야 합니다.
-    const host = "localhost"
-    const recommendationResponse = await axios.post(`http://${host}:8088/ai/recommendation`, data)
-    let selectedKeyword = recommendationResponse.data.trim()
+    const host = "localhost";
+    const recommendationResponse = await axios.post(
+      `http://${host}:8088/ai/recommendation`,
+      data
+    );
+    let selectedKeyword = recommendationResponse.data.trim();
 
     if (selectedKeyword === "") {
       utility.printLogWithName("검색 요청 처리 실패 (추천 도서)", "Search API");
-      return res.status(200).send("{}")
-    }
-    else {
-      let temp_pageNum = 1
-      let temp_booksPerPage = 12
+      return res.status(200).send("{}");
+    } else {
+      let temp_pageNum = 1;
+      let temp_booksPerPage = 12;
 
-      utility.printLogWithName(`키워드 추천 성공 ! 키워드 == ${selectedKeyword}`, "Search API - TEST")
+      utility.printLogWithName(
+        `키워드 추천 성공 ! 키워드 == ${selectedKeyword}`,
+        "Search API - TEST"
+      );
 
       bookList = await dbQuery.query_page_from_keyword(
         selectedKeyword,
@@ -136,14 +142,16 @@ async function __post_search_by_recommendation(req, res) {
         temp_booksPerPage
       );
 
-      let temp_jsonString = JSON.stringify(bookList)
+      let temp_jsonString = JSON.stringify({
+        selectedKeyword: selectedKeyword,
+        bookList: bookList,
+      });
       utility.printLogWithName("검색 요청 처리 완료 (추천 도서)", "Search API");
       return res.status(200).send(temp_jsonString);
     }
   } catch (error) {
     console.error("Error in __post_search_by_recommendation:", error);
     return res.status(500).send("Internal Server Error");
-
   }
 }
 
