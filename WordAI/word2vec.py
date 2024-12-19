@@ -1,38 +1,46 @@
 import sys
 import time
-import socket
+
+from flask import Flask
+from flask import request
+
 import wordembedding as embed
 from recommender import recommend_one_keyword
 
-def start_server():
-    HOST = "127.0.0.1"
-    PORT = 8088
+webServer = Flask(__name__)
+model = None
 
-    serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    serverSocket.bind((HOST, PORT))
-    serverSocket.listen()
+@webServer.route("/ai/recommendation", methods=["POST"])
+def api_recommendation():
+    global model
+
+    keywords = request.get_json()
+    data = ""
+    data += keywords["positiveKeywords"]
+    data += "@"
+    data += keywords["negativeKeywords"]
+    data += "@"
+    data += keywords["randomKeywords"]
+
+    print("Recommendation request occurs.")
+    print(f"\tpositives: {keywords["positiveKeywords"]}")
+    print(f"\tnegatives: {keywords["negativeKeywords"]}")
+    print(f"\trandoms: {keywords["randomKeywords"]}")
+
+    recommendedKeyword = recommend_one_keyword(model, data)
+
+    print(f"\trecommendedKeyword: {recommendedKeyword}")
+
+    return recommendedKeyword, 200
+
+def main():
+    global model
 
     model = embed.WordEmbedding()
-    print("Load AI Model. please Wait.", end="", flush=True)
     model.load_model("C:/Programming/PythonAI/GoogleNews-vectors-negative300.bin")
     sys.stdout.flush()
     time.sleep(1)
-    print("<INITIALIZED>", end="", flush=True)
-
-    while True:
-        clientSocket, addr = serverSocket.accept()
-        dataBytes = clientSocket.recv(8192)
-        data = dataBytes.decode("utf-8")
-
-        if data == "<CLOSE>":
-            clientSocket.close()
-            break
-        else:
-            recommendedKeywords = recommend_one_keyword(model, data)
-            clientSocket.sendall(recommendedKeywords.encode("utf-8"))
-            clientSocket.close()
-
-    serverSocket.close()
+    webServer.run(host="0.0.0.0", port=8088, debug=True, use_reloader=False)
 
 if __name__ == "__main__":
-    start_server()
+    main()

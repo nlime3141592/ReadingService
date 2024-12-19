@@ -10,21 +10,21 @@ class WordEmbedding:
 
     def load_model(self, model_path):
         time.sleep(1)
-        print("Start loading the Word2Vec model. This may take some time.", end="", flush=True)
+        print("Start loading the Word2Vec model. This may take some time.", flush=True)
         sys.stdout.flush()
         time_start = time.time()
         self.__model = KeyedVectors.load_word2vec_format(model_path, binary=True)
         time_delta = time.time() - time_start
-        print("Word2Vec Model Loaded. (in %.7f seconds)" % (time_delta), end="")
+        print("Word2Vec Model Loaded. (in %.7f seconds)" % (time_delta))
 
     def get_word_vector(self, word):
         try:
             return self.__model[word]
         except KeyError as keyError:
-            print(f"The word \"{word}\" is missing in word dictionary.", end="")
+            print(f"The word \"{word}\" is missing in word dictionary.")
             return np.zeros(shape=(300,))
         except Exception as exception:
-            print("Unknown Error.", end="")
+            print("Unknown Error.")
             return np.zeros(shape=(300,))
 
     def get_similarity_by_word(self, word_0, word_1):

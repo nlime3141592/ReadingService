@@ -76,12 +76,12 @@ def select_one_keyword(model, keywords):
     negativeKeywords = keywords[1]
     randomKeywords = keywords[2]
 
-    print("pos == ", end="")
-    print(positiveKeywords)
-    print("neg == ", end="")
-    print(negativeKeywords)
-    print("rng == ", end="")
-    print(randomKeywords)
+    # print("pos == ", end="")
+    # print(positiveKeywords)
+    # print("neg == ", end="")
+    # print(negativeKeywords)
+    # print("rng == ", end="")
+    # print(randomKeywords)
 
     positiveVectors = [ model.get_word_vector(positiveKeywords[i].split("+")[1]) for i in range(len(positiveKeywords))]
     negativeVectors = [ model.get_word_vector(negativeKeywords[i].split("+")[1]) for i in range(len(negativeKeywords))]
@@ -114,4 +114,4 @@ def recommend_one_keyword(model, data):
     # NOTE: 최종 선정된 키워드의 영어 버전입니다.
     selectedKeyword_en = keywords_en[2][selectedKeywordIndex].split("+")[1]
 
-    return selectedKeyword_en
+    return selectedKeyword_ko
