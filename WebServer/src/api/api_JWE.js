@@ -13,7 +13,9 @@ function __init(app) {
 
 async function __post_jwe_verify(req, res) {
   const requestBody = req.body;
-  const token = await verifyJWE.verifyJWE(requestBody["jwe"]);
+  const { jwe } = requestBody;
+
+  const token = await verifyJWE.verifyJWE(jwe);
   if (!token) return res.status(400).send("Invalid JWE");
   else return res.status(200).send("valid JWE");
 }
