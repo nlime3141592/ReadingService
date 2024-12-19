@@ -2,63 +2,60 @@ const fs = require("fs");
 const crypto = require("crypto");
 const jose = require("jose");
 
-const privateKeyPem = fs.readFileSync(
-  "C:\\Programming\\web\\ssl\\private.pem",
-  "utf-8"
-);
+const privateKeyPem = fs.readFileSync("./static/ssl/private.pem", "utf-8");
 const privateKey = crypto.createPrivateKey(privateKeyPem);
 
 async function verifyJWE(jwe) {
-  // JWE 복호화
-  const { plaintext, _ } = await jose.compactDecrypt(jwe, privateKey);
+    // JWE 복호화
+    const { plaintext, _ } = await jose.compactDecrypt(jwe, privateKey);
 
-  const payload = JSON.parse(plaintext.toString());
+    const payload = JSON.parse(plaintext.toString());
 
-  const now = new Date();
-  if (now > new Date(payload["exp"])) {
-    return false;
-  }
+    const now = new Date();
+    if (now > new Date(payload["exp"])) {
+        return false;
+    }
 
-  const res = await fetch("https://api.notion.com/v1/users/me", {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${payload["token"]}`,
-      "Notion-Version": "2022-06-28",
-    },
-  });
-  if (!res.ok) {
-    return false;
-  }
+    const res = await fetch("https://api.notion.com/v1/users/me", {
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${payload["token"]}`,
+            "Notion-Version": "2022-06-28",
+        },
+    });
+    if (!res.ok) {
+        return false;
+    }
 
-  return payload["token"];
+    return payload["token"];
 }
 
 async function getAccessablePageId(token) {
-  const res = await fetch("https://api.notion.com/v1/search", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Notion-Version": "2022-06-28",
-    },
-    body: JSON.stringify({
-      query: "",
-      filter: {
-        value: "page",
-        property: "object",
-      },
-    }),
-  });
-  if (!res.ok) {
-    return false;
-  }
-  const data = await res.json();
-  let pageId = null;
-  data["results"].forEach((element) => {
-    if (element["parent"]["type"] == "workspace") {
-      pageId = element["id"];
+    const res = await fetch("https://api.notion.com/v1/search", {
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${token}`,
+            "Notion-Version": "2022-06-28",
+        },
+        body: JSON.stringify({
+            query: "",
+            filter: {
+                value: "page",
+                property: "object",
+            },
+        }),
+    });
+    if (!res.ok) {
+        return false;
     }
-  });
-  return pageId;
+    const data = await res.json();
+    let pageId = null;
+    data["results"].forEach((element) => {
+        if (element["parent"]["type"] == "workspace") {
+            pageId = element["id"];
+        }
+    });
+    return pageId;
 }
 
 module.exports = { verifyJWE, getAccessablePageId };

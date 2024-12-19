@@ -24,3 +24,8 @@ env/
 .idea/
 *.swp
 .DS_Store
+
+*.zip
+*.pem
+*.bin
+
