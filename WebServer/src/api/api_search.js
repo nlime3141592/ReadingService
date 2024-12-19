@@ -72,10 +72,6 @@ async function __get_search_by_recommendation(req, res) {
   let command = `python ${modulePath} \"음악/미술/수학/경제/\" \"사회/문화/체육/국어/\" \"컴퓨터/정보/과학/진로/미래/전기/공학/기계/조각/\"`;
   let { stdout, stderr } = await utility.execPromise(command);
 
-<<<<<<< Updated upstream
-  if (stdout === "")
-  {
-=======
   const byteArray = new Uint8Array(
     stdout
       .split("\\x") // "\x"를 기준으로 분리
@@ -86,36 +82,26 @@ async function __get_search_by_recommendation(req, res) {
   const decoder = new TextDecoder("utf-8");
   const decodedString = decoder.decode(byteArray).trim();
 
-  if (decodedString === "") {
->>>>>>> Stashed changes
+  if (decodedString === "")
+  {
     utility.printLogWithName("검색 요청 처리 실패 (추천 도서)", "Search API");
-    res.send([]);
-  } else {
-    let temp_pageNum = 1;
-    let temp_booksPerPage = 12;
+    res.send([])
+  }
+  else
+  {
+    let temp_pageNum = 1
+    let temp_booksPerPage = 12
 
-<<<<<<< Updated upstream
-    // NOTE:
-    // stdout에서 최종 결과가 출력됩니다.
-    // WordAI/recommender.py 함수의 recommend_one_keyword() 함수의 결과입니다.
-    // TODO:
-    // 한국어의 인코딩 문제로 인한 글자 깨짐 현상을 해결해야 합니다. (영어는 잘 됩니다.)
-    utility.printLogWithName(`키워드 추천 성공 ! 키워드 == ${stdout}`, "Search API - TEST")
-=======
-    utility.printLogWithName(
-      `키워드 추천 성공 ! 키워드 == ${decodedString}`,
-      "Search API - TEST"
-    );
->>>>>>> Stashed changes
+    utility.printLogWithName(`키워드 추천 성공 ! 키워드 == ${decodedString}`, "Search API - TEST")
 
     bookList = await dbQuery.query_page_from_keyword(
-      stdout,
+      decodedString,
       temp_pageNum,
       temp_booksPerPage
     );
-    let temp_jsonString = JSON.stringify(bookList);
+    let temp_jsonString = JSON.stringify(bookList)
     res.send(temp_jsonString);
-
+    
     utility.printLogWithName("검색 요청 처리 완료 (추천 도서)", "Search API");
   }
 }
