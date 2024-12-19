@@ -47,25 +47,6 @@ async function main() {
 
     await db_connection.init();
 
-    // NOTE: HTTP 서버 생성 및 리디렉션 설정
-    const httpServer = http.createServer((req, res) => {
-        res.writeHead(301, {
-            Location: `https://${req.headers.host.replace(
-                /:\d+/,
-                `:${c_NUM_PORT_HTTPS}`
-            )}${req.url}`,
-        });
-        res.end();
-    });
-
-    // NOTE: HTTP 서버 리스닝
-    httpServer.listen(c_NUM_PORT_HTTP, () => {
-        utility.printLogWithName(
-            `HTTP 서버가 ${c_NUM_PORT_HTTP} 포트에서 실행 중입니다.`,
-            "System"
-        );
-    });
-
     // NOTE: HTTPS 서버를 열고 클라이언트 요청 발생을 대기합니다.
     const httpsServer = https
         .createServer(credentials, app)
@@ -89,14 +70,6 @@ async function main() {
         utility.printLogWithName("서버 종료 중...", "System");
 
         await db_connection.final();
-
-        httpServer.close(() => {
-            utility.printLogWithName(
-                "http 서버가 정상적으로 종료되었습니다.",
-                "System"
-            );
-            process.exit(0);
-        });
 
         httpsServer.close(() => {
             utility.printLogWithName(

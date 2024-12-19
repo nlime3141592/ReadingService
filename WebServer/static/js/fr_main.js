@@ -60,7 +60,7 @@ rightButton.onclick = () => {
 };
 
 loginButton.onclick = () => {
-    const loginPage = `https://api.notion.com/v1/oauth/authorize?client_id=15ed872b-594c-80f0-ab76-0037de8dd2b4&response_type=code&owner=user&redirect_uri=https%3A%2F%2Flocalhost%3A8443%2Fjwe%2Fcreate`;
+    const loginPage = `https://api.notion.com/v1/oauth/authorize?client_id=15ed872b-594c-80f0-ab76-0037de8dd2b4&response_type=code&owner=user&redirect_uri=https%3A%2F%2Fread-book-pjt.site%3A8443%2Fjwe%2Fcreate`;
     window.location.href = loginPage;
 };
 

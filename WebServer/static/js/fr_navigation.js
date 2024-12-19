@@ -6,17 +6,17 @@ const recordButton = document.getElementById("btn-record");
 const loginButton = document.getElementById("login-button");
 
 loginButton.onclick = () => {
-  const loginPage = `https://api.notion.com/v1/oauth/authorize?client_id=15ed872b-594c-80f0-ab76-0037de8dd2b4&response_type=code&owner=user&redirect_uri=https%3A%2F%2Flocalhost%3A8443%2Fjwe%2Fcreate`;
-  window.location.href = loginPage;
+    const loginPage = `https://api.notion.com/v1/oauth/authorize?client_id=15ed872b-594c-80f0-ab76-0037de8dd2b4&response_type=code&owner=user&redirect_uri=https%3A%2F%2Fread-book-pjt.site%3A8443%2Fjwe%2Fcreate`;
+    window.location.href = loginPage;
 };
 homeButton.onclick = () => {
-  goBookList(0);
+    goBookList(0);
 };
 recommendButton.onclick = () => {
-  goBookList(1);
+    goBookList(1);
 };
 recordButton.onclick = () => {
-  goBookList(2);
+    goBookList(2);
 };
 
 /**
@@ -24,9 +24,9 @@ recordButton.onclick = () => {
  * @param {Number} mode 이동하고자 하는 책 목록 화면 - {0: 메인, 1: 추천, 2: 기록}
  */
 function goBookList(mode) {
-  sessionStorage.setItem(
-    "event",
-    JSON.stringify({ function: "initBookList", mode: mode })
-  );
-  window.location = "/";
+    sessionStorage.setItem(
+        "event",
+        JSON.stringify({ function: "initBookList", mode: mode })
+    );
+    window.location = "/";
 }
