@@ -102,7 +102,17 @@ async function getPage(_mode) {
   setStatus(statusString[mode]);
   switch (mode) {
     case 1:
-      isbnList[mode] = await (await fetch(`/search/by-recommendation`)).json();
+      isbnList[mode] = await (
+        await fetch(`/search/by-recommendation`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            jwe: storedJWE,
+          })
+        })
+      ).json();
       break;
     case 2:
       isbnList[mode] = await (
@@ -236,9 +246,9 @@ function setBook(bookSlot, book) {
   const author =
     typeof book["author"] === "string"
       ? book["author"]
-          .split(",")[0]
-          .replace(/\([^)]*\)/g, "")
-          .trim()
+        .split(",")[0]
+        .replace(/\([^)]*\)/g, "")
+        .trim()
       : "Unknown Author";
 
   bookAuthor.textContent = author;
