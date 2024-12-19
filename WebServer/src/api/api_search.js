@@ -2,6 +2,7 @@ module.exports = {
   init: __init,
 };
 
+const axios = require("axios")
 const utility = require("../utility.js");
 const dbQuery = require("../db/db_query.js");
 const verifyJWE = require("../../JWE/verifyJWE.js");
@@ -56,8 +57,6 @@ async function __get_search_by_keyword(req, res) {
 }
 
 async function __get_search_by_recommendation(req, res) {
-  let modulePath = utility.getPythonPath("api_recommendation.py");
-
   // NOTE:
   // 추천 시스템을 사용하기 위한 Sub Process를 호출합니다.
   // python ${modulePath} <좋아요키워드리스트> <싫어요키워드리스트> <랜텀키워드리스트>
@@ -69,20 +68,18 @@ async function __get_search_by_recommendation(req, res) {
   // 랜덤 키워드 리스트: 최대 100개
   // TODO:
   // 랜덤 키워드 리스트는 DB에서 아무 키워드나 쿼리하면 됩니다.
-  let command = `python ${modulePath} \"음악/미술/수학/경제/\" \"사회/문화/체육/국어/\" \"컴퓨터/정보/과학/진로/미래/전기/공학/기계/조각/\"`;
-  let { stdout, stderr } = await utility.execPromise(command);
+  const data = {
+    "positiveKeywords": "음악/미술/수학/경제/",
+    "negativeKeywords": "사회/문화/체육/국어/",
+    "randomKeywords": "컴퓨터/정보/과학/진로/미래/전기/공학/기계/조각/"
+  }
 
-  const byteArray = new Uint8Array(
-    stdout
-      .split("\\x") // "\x"를 기준으로 분리
-      .filter((b) => b) // 빈 요소 제거 (split 후 첫 요소가 빈 문자열)
-      .map((hex) => parseInt(hex, 16))
-  );
-
-  const decoder = new TextDecoder("utf-8");
-  const decodedString = decoder.decode(byteArray).trim();
-
-  if (decodedString === "")
+  // TODO: 최종 배포할 때 host 주소를 올바르게 설정해야 합니다.
+  const host = "localhost"
+  const recommendationResponse = await axios.post(`http://${host}:8088/ai/recommendation`, data)
+  let selectedKeyword = recommendationResponse.data.trim()
+  
+  if (selectedKeyword === "")
   {
     utility.printLogWithName("검색 요청 처리 실패 (추천 도서)", "Search API");
     res.send([])
@@ -92,10 +89,10 @@ async function __get_search_by_recommendation(req, res) {
     let temp_pageNum = 1
     let temp_booksPerPage = 12
 
-    utility.printLogWithName(`키워드 추천 성공 ! 키워드 == ${decodedString}`, "Search API - TEST")
+    utility.printLogWithName(`키워드 추천 성공 ! 키워드 == ${selectedKeyword}`, "Search API - TEST")
 
     bookList = await dbQuery.query_page_from_keyword(
-      decodedString,
+      selectedKeyword,
       temp_pageNum,
       temp_booksPerPage
     );
