@@ -9,11 +9,11 @@ const submitButton = document.getElementById("btn-done");
 submitButton.onclick = submit;
 
 window.onload = async function () {
-  await isLogined();
   const urlParams = new URLSearchParams(window.location.search);
   const isbn = urlParams.get("isbn");
   bookInfo = await (await fetch(`/search/by-isbn13/${isbn}`)).json();
   setBook();
+  await isLogined();
 };
 
 submitButton.onclick = submit;

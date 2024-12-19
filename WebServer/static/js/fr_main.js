@@ -2,27 +2,56 @@ console.log("load main.js");
 
 let logined = false;
 let storedJWE = sessionStorage.getItem("jweToken");
-const BOOKS_PER_PAGE = 12;
-
 let pageNum = 1;
-// isbn 리스트 | {0: 없음, 1: 추천, 2: 독서 기록}
-let isbnList = [null, null, null];
 let searchKeyword = "";
-let mode = 0; // 0: 메인, 1: 추천, 2: 독서 기록, 3: 검색 기록
+// 0: 메인, 1: 추천, 2: 독서 기록, 3: 검색 기록
+let mode = 0;
+// isbn 리스트 | {0: 없음, 1: 추천, 2: 독서 기록}
+let isbnList = { 1: [], 2: [] };
 
+const BOOKS_PER_PAGE = 12;
 const statusText = document.getElementById("status-text");
 const homeButton = document.getElementById("btn-home");
 const recommendButton = document.getElementById("btn-recommend");
 const recordButton = document.getElementById("btn-record");
 const searchButton = document.getElementById("search-button");
-
-homeButton.onclick = getHome;
-recommendButton.onclick = getRecommend;
-recordButton.onclick = getRecord;
-searchButton.onclick = getSearch;
-
 const leftButton = document.getElementById("left-button");
 const rightButton = document.getElementById("right-button");
+const loginButton = document.getElementById("login-button");
+
+homeButton.onclick = () => {
+  getPage(0);
+};
+recommendButton.onclick = () => {
+  getPage(1);
+};
+recordButton.onclick = () => {
+  getPage(2);
+};
+searchButton.onclick = () => {
+  getPage(3);
+};
+
+window.onload = async function () {
+  const urlParams = new URLSearchParams(window.location.search);
+  const jwe = urlParams.get("jwe");
+  if (jwe) {
+    sessionStorage.setItem("jweToken", jwe);
+    storedJWE = sessionStorage.getItem("jweToken");
+  }
+
+  const eventData = JSON.parse(sessionStorage.getItem("event"));
+  if (eventData) {
+    const { function: funcName, mode } = eventData;
+    if (funcName == "initBookList" && mode != null) {
+      getPage(mode);
+    }
+    sessionStorage.removeItem("event"); // 실행 후 삭제
+  } else {
+    getPage(0);
+  }
+  await isLogined();
+};
 
 leftButton.onclick = () => {
   getNextPage(-1);
@@ -31,43 +60,9 @@ rightButton.onclick = () => {
   getNextPage(+1);
 };
 
-const loginButton = document.getElementById("login-button");
 loginButton.onclick = () => {
   const loginPage = `https://api.notion.com/v1/oauth/authorize?client_id=15ed872b-594c-80f0-ab76-0037de8dd2b4&response_type=code&owner=user&redirect_uri=https%3A%2F%2Flocalhost%3A8443%2Fjwe%2Fcreate`;
   window.location.href = loginPage;
-};
-
-/**
- * 다른 HTML 페이지에서 네비게이션 바를 이용하여 이동한 경우 페이지 초기화를 위한 작업
- */
-window.onload = async function () {
-  const urlParams = new URLSearchParams(window.location.search);
-  const jwe = urlParams.get("jwe");
-  if (jwe) {
-    sessionStorage.setItem("jweToken", jwe);
-    storedJWE = sessionStorage.getItem("jweToken");
-  }
-  await isLogined();
-  const eventData = JSON.parse(sessionStorage.getItem("event"));
-  if (eventData) {
-    const { function: funcName, mode } = eventData;
-    if (funcName == "initBookList" && mode != null) {
-      switch (mode) {
-        case 0:
-          getHome();
-          break;
-        case 1:
-          getRecommend();
-          break;
-        case 2:
-          getRecord();
-          break;
-      }
-    }
-    sessionStorage.removeItem("event"); // 실행 후 삭제
-  } else {
-    getHome();
-  }
 };
 
 async function isLogined() {
@@ -93,65 +88,45 @@ function setElement(isLogined) {
   }
 }
 
+async function getPage(_mode) {
+  setBookShelf([]);
+  searchKeyword = document.getElementsByClassName("search-text")[0].value;
+  mode = _mode;
+  pageNum = 0;
+  statusString = [
+    "도서 목록",
+    "추천 도서",
+    "독서 기록",
+    `검색: ${searchKeyword}`,
+  ];
+  setStatus(statusString[mode]);
+  switch (mode) {
+    case 1:
+      isbnList[mode] = await (await fetch(`/search/by-recommendation`)).json();
+      break;
+    case 2:
+      isbnList[mode] = await (
+        await fetch(`/search/by-history`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            jwe: storedJWE,
+          }),
+        })
+      ).json();
+      break;
+    default:
+      break;
+  }
+  getNextPage(+1);
+}
+
 /**
  * 상태 표시 텍스트를 변경
  * @param {string} string 변경할 텍스트
  */
-function setStatus(string) {
-  statusText.textContent = string;
-}
-
-// 홈 버튼 함수
-async function getHome() {
-  setBookShelf([]);
-  mode = 0;
-  pageNum = 0;
-  setStatus("도서 목록");
-  getNextPage(+1);
-}
-
-// 추천 도서 버튼 함수
-async function getRecommend() {
-  setBookShelf([]);
-  mode = 1;
-  pageNum = 0;
-  setStatus("추천 도서");
-  // 서버에서 추천 받기
-  isbnList[mode] = await (await fetch(`/search/by-recommendation`)).json();
-  getNextPage(+1);
-}
-
-// 독서 기록 버튼 함수
-async function getRecord() {
-  setBookShelf([]);
-  mode = 2;
-  pageNum = 0;
-  setStatus("독서 기록");
-  // notion 에서 리스트 가져오기
-  isbnList[mode] = await (
-    await fetch(`/search/by-history`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        jwe: storedJWE,
-      }),
-    })
-  ).json();
-  getNextPage(+1);
-}
-
-// 검색 버튼 함수
-async function getSearch() {
-  setBookShelf([]);
-  mode = 3;
-  pageNum = 0;
-  searchKeyword = document.getElementsByClassName("search-text")[0].value;
-  setStatus(`검색: ${searchKeyword}`);
-  getNextPage(+1);
-}
-
 function setStatus(string) {
   statusText.textContent = string;
 }

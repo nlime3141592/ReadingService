@@ -1,19 +1,18 @@
 console.log("load bookDetail.js");
 
-let storedJWE = sessionStorage.getItem("jweToken");
 let logined = false;
 let bookInfo = null;
+let rank = 0;
+let storedJWE = sessionStorage.getItem("jweToken");
 
 const userRankButton = document.getElementById("user-rank-button");
 
-let rank = 0;
-
 window.onload = async function () {
-  await isLogined();
   const urlParams = new URLSearchParams(window.location.search);
   const isbn = urlParams.get("isbn");
   bookInfo = await (await fetch(`/search/by-isbn13/${isbn}`)).json();
   setBook();
+  await isLogined();
 };
 
 async function isLogined() {
@@ -157,7 +156,6 @@ async function setBottomGrid(bookInfo) {
 
   // set user rank
   const userRank = document.querySelector("#user-rank");
-  // notion 에서 기존 유저의 평가 가져오는 방법이 필요
   let rankMark = "🤍";
   if (logined) {
     rankMark = await getUserRank();
@@ -177,7 +175,5 @@ async function setBottomGrid(bookInfo) {
 
   // set report button
   const reportButton = document.querySelector("#reading-note");
-  // 세션에 따라 표시 여부 설정 필요
-  // 연결될 url 삽입
   reportButton.href = `/readnote/?isbn=${bookInfo["isbn13"]}`;
 }
