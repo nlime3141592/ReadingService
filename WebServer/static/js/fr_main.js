@@ -7,7 +7,7 @@ let searchKeyword = "";
 // 0: 메인, 1: 추천, 2: 독서 기록, 3: 검색 기록
 let mode = 0;
 // isbn 리스트 | {0: 없음, 1: 추천, 2: 독서 기록}
-let isbnList = { 1: [], 2: [] };
+let isbnList = [];
 
 const BOOKS_PER_PAGE = 12;
 const statusText = document.getElementById("status-text");
@@ -100,25 +100,18 @@ async function getPage(_mode) {
     `검색: ${searchKeyword}`,
   ];
   setStatus(statusString[mode]);
-  switch (mode) {
-    case 1:
-      isbnList[mode] = await (await fetch(`/search/by-recommendation`)).json();
-      break;
-    case 2:
-      isbnList[mode] = await (
-        await fetch(`/search/by-history`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            jwe: storedJWE,
-          }),
-        })
-      ).json();
-      break;
-    default:
-      break;
+  if (mode == 2) {
+    isbnList = await (
+      await fetch(`/search/by-history`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          jwe: storedJWE,
+        }),
+      })
+    ).json();
   }
   getNextPage(+1);
 }
@@ -165,14 +158,16 @@ async function getBookList(pageNum) {
       bookList = await response_main.json();
       break;
     case 1: // 추천
+      bookList = await (await fetch(`/search/by-recommendation`)).json();
+      break;
     case 2: // 독서 기록
-      if (Object.keys(isbnList[mode]).length >= (pageNum - 1) * 10) {
+      if (Object.keys(isbnList).length >= (pageNum - 1) * 10) {
         for (
           let idx = (pageNum - 1) * BOOKS_PER_PAGE + 1;
           idx <= pageNum * BOOKS_PER_PAGE;
           idx++
         ) {
-          const isbn = Object.keys(isbnList[mode])[idx - 1];
+          const isbn = Object.keys(isbnList)[idx - 1];
           if (isbn) {
             // DB에서 특정 ISBN에 대한 bookInfo의 요청
             const response_record = await fetch(`/search/by-isbn13/${isbn}`);

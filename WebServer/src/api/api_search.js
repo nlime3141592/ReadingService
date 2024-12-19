@@ -2,7 +2,7 @@ module.exports = {
   init: __init,
 };
 
-const axios = require("axios")
+const axios = require("axios");
 const utility = require("../utility.js");
 const dbQuery = require("../db/db_query.js");
 const verifyJWE = require("../../JWE/verifyJWE.js");
@@ -69,36 +69,39 @@ async function __get_search_by_recommendation(req, res) {
   // TODO:
   // 랜덤 키워드 리스트는 DB에서 아무 키워드나 쿼리하면 됩니다.
   const data = {
-    "positiveKeywords": "음악/미술/수학/경제/",
-    "negativeKeywords": "사회/문화/체육/국어/",
-    "randomKeywords": "컴퓨터/정보/과학/진로/미래/전기/공학/기계/조각/"
-  }
+    positiveKeywords: "음악/미술/수학/경제/",
+    negativeKeywords: "사회/문화/체육/국어/",
+    randomKeywords: "컴퓨터/정보/과학/진로/미래/전기/공학/기계/조각/",
+  };
 
   // TODO: 최종 배포할 때 host 주소를 올바르게 설정해야 합니다.
-  const host = "localhost"
-  const recommendationResponse = await axios.post(`http://${host}:8088/ai/recommendation`, data)
-  let selectedKeyword = recommendationResponse.data.trim()
-  
-  if (selectedKeyword === "")
-  {
-    utility.printLogWithName("검색 요청 처리 실패 (추천 도서)", "Search API");
-    res.send([])
-  }
-  else
-  {
-    let temp_pageNum = 1
-    let temp_booksPerPage = 12
+  const host = "localhost";
+  const recommendationResponse = await axios.post(
+    `http://${host}:8088/ai/recommendation`,
+    data
+  );
+  let selectedKeyword = recommendationResponse.data.trim();
 
-    utility.printLogWithName(`키워드 추천 성공 ! 키워드 == ${selectedKeyword}`, "Search API - TEST")
+  if (selectedKeyword === "") {
+    utility.printLogWithName("검색 요청 처리 실패 (추천 도서)", "Search API");
+    res.send([]);
+  } else {
+    let temp_pageNum = 1;
+    let temp_booksPerPage = 12;
+
+    utility.printLogWithName(
+      `키워드 추천 성공 ! 키워드 == ${selectedKeyword}`,
+      "Search API - TEST"
+    );
 
     bookList = await dbQuery.query_page_from_keyword(
       selectedKeyword,
       temp_pageNum,
       temp_booksPerPage
     );
-    let temp_jsonString = JSON.stringify(bookList)
+    let temp_jsonString = JSON.stringify(bookList);
     res.send(temp_jsonString);
-    
+
     utility.printLogWithName("검색 요청 처리 완료 (추천 도서)", "Search API");
   }
 }
