@@ -4,13 +4,15 @@ module.exports = {
 
 const utility = require("../utility.js");
 const dbQuery = require("../db/db_query.js");
+const verifyJWE = require("../../JWE/verifyJWE.js");
+const getBookRank = require("../../NotionAPI/book/getBookRank.js");
 
 function __init(app) {
   app.get("/search/all", __get_search_all);
   app.get("/search/by-isbn13/:isbn13", __get_search_by_isbn13);
   app.get("/search/by-keyword/:keyword", __get_search_by_keyword);
   app.get("/search/by-recommendation", __get_search_by_recommendation);
-  app.get("/search/by-history", __get_search_by_history);
+  app.post("/search/by-history", __post_search_by_history);
 }
 
 // NOTE: OK.
@@ -104,11 +106,21 @@ async function __get_search_by_recommendation(req, res) {
   }
 }
 
-function __get_search_by_history(req, res) {
-  jsonPages = {
-    "test-json": "please-this-json-remove-after-test",
-  };
-  res.send(JSON.stringify(jsonPages));
+async function __post_search_by_history(req, res) {
+  try {
+    const requestBody = req.body;
 
-  utility.printLogWithName("검색 요청 처리 완료 (독서 기록)", "Search API");
+    const token = await verifyJWE.verifyJWE(requestBody["jwe"]);
+    if (!token) return res.status(400).send("Invalid JWE");
+
+    const pageId = await verifyJWE.getAccessablePageId(token);
+    if (!pageId) res.status(400).send("Page ID not found");
+
+    const responseEveryRank = await getBookRank.getEveryBookRank(token, pageId);
+    utility.printLogWithName("검색 요청 처리 완료 (독서 기록)", "Search API");
+    return res.status(200).send(JSON.stringify(responseEveryRank));
+  } catch (error) {
+    console.error("Error in __get_search_by_history:", error);
+    return res.status(500).send("Internal Server Error");
+  }
 }

@@ -1,33 +1,12 @@
 console.log("load bookReport.js");
 
-let storedJWE = sessionStorage.getItem("jweToken");
 let bookInfo = null;
+let logined = false;
+let storedJWE = sessionStorage.getItem("jweToken");
 
 // 감상문 등록 버튼
 const submitButton = document.getElementById("btn-done");
-
 submitButton.onclick = submit;
-
-const loginButton = document.getElementById("login-button");
-loginButton.onclick = () => {
-  const loginPage = `https://api.notion.com/v1/oauth/authorize?client_id=15ed872b-594c-80f0-ab76-0037de8dd2b4&response_type=code&owner=user&redirect_uri=https%3A%2F%2Flocalhost%3A8443%2Fjwe%2Fcreate`;
-  window.location.href = loginPage;
-};
-
-// 네비게이션 바
-const homeButton = document.getElementById("btn-home");
-const recommendButton = document.getElementById("btn-recommend");
-const recordButton = document.getElementById("btn-record");
-
-homeButton.onclick = () => {
-  goBookList(0);
-};
-recommendButton.onclick = () => {
-  goBookList(1);
-};
-recordButton.onclick = () => {
-  goBookList(2);
-};
 
 window.onload = async function () {
   await isLogined();
@@ -37,8 +16,12 @@ window.onload = async function () {
   setBook();
 };
 
+submitButton.onclick = submit;
+
+/**
+ * 현재 저장된 JWE 토큰의 유효성 판단을 통해 로그인되었는지 확인함
+ */
 async function isLogined() {
-  let logined = false;
   if (storedJWE != null) {
     const verifyResult = await fetch(`/jwe/verify`, {
       method: "POST",
@@ -50,7 +33,11 @@ async function isLogined() {
     if (verifyResult.ok) logined = true;
     else console.error("JWE 검증 실패:", await verifyResult.text());
   }
-  if (logined) {
+  setElement(logined);
+}
+
+function setElement(isLogined) {
+  if (isLogined) {
     document.querySelector("#btn-recommend").classList.remove("hide");
     document.querySelector("#btn-record").classList.remove("hide");
     document.querySelector("#btn-done").classList.remove("hide");
@@ -58,23 +45,14 @@ async function isLogined() {
   }
 }
 
-/**
- * 네비게이션 바에서 이동을 위해 로컬 저장소에 mode를 저장
- * @param {Number} mode 이동하고자 하는 책 목록 화면 - {0: 메인, 1: 추천, 2: 기록}
- */
-function goBookList(mode) {
-  sessionStorage.setItem(
-    "event",
-    JSON.stringify({ function: "initBookList", mode: mode })
-  );
-  window.location = "/";
-}
-
 async function setBook() {
   document.querySelector("#book-info-image").src = bookInfo["cover"];
   document.querySelector("#book-info-text").textContent = bookInfo["title"];
 }
 
+/**
+ * 작성한 감상문을 등록하는 함수
+ */
 async function submit() {
   const richText = htmlToNotion(
     document.getElementsByClassName("ql-editor")[0]

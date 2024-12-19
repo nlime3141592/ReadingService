@@ -10,7 +10,7 @@ const headers = {
 async function getEveryBookRank(token, pageId) {
   headers["Authorization"] = token;
   const databaseId = await getDatabaseId.getDatabaseId(token, pageId);
-  const everyTupleData = await getEveryTuple(databaseId);
+  const everyTupleData = await getEveryTuple(token, databaseId);
   const bookRanks = extractRankFromTuples(everyTupleData);
   return bookRanks;
 }

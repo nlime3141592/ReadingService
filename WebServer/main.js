@@ -10,7 +10,7 @@ const fs = require("fs");
 // NOTE: 본 프로젝트에서 구현한 모듈(소스 코드)을 임포트합니다.
 const utility = require("./src/utility.js");
 const db_connection = require("./src/db/db_connection.js");
-const main_ai = require("./main_ai.js")
+const main_ai = require("./main_ai.js");
 
 // NOTE: 서버가 포함할 API 모듈 목록을 이 곳에 작성합니다.
 const api_main = require("./src/api/api_main.js");
@@ -53,7 +53,7 @@ async function main() {
   api_notion.init(app);
 
   await db_connection.init();
-  await main_ai.init();
+  // await main_ai.init();
 
   // NOTE: HTTP 서버 생성 및 리디렉션 설정
   const httpServer = http.createServer((req, res) => {
