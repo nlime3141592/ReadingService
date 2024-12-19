@@ -2,7 +2,7 @@ module.exports = {
   init: __init,
 };
 
-const axios = require("axios")
+const axios = require("axios");
 const utility = require("../utility.js");
 const dbQuery = require("../db/db_query.js");
 const verifyJWE = require("../../JWE/verifyJWE.js");
@@ -143,6 +143,7 @@ async function __post_search_by_recommendation(req, res) {
   } catch (error) {
     console.error("Error in __post_search_by_recommendation:", error);
     return res.status(500).send("Internal Server Error");
+
   }
 }
 
